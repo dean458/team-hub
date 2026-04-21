@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfect Care Stick — Dr.Felis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #F26522;
+      --orange-light: #FFF0E8;
+      --black: #111111;
+      --gray-dark: #333333;
+      --gray-mid: #666666;
+      --gray-light: #F5F5F5;
+      --white: #FFFFFF;
+      --radius: 16px;
+      --max-w: 860px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--black);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 80px 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #EBEBEB;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .brand {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand span {
+      color: var(--orange);
+    }
+
+    .nav-cta {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: 0.2px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 80px 0 60px;
+      background: var(--white);
+    }
+
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--orange-light);
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 em {
+      color: var(--orange);
+      font-style: normal;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--gray-mid);
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      display: block;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--orange);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--gray-mid);
+      margin-top: 4px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+
+    .btn-secondary {
+      color: var(--gray-dark);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 1px solid #ccc;
+    }
+
+    /* PRODUCT IMAGE AREA */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .product-card {
+      width: 100%;
+      max-width: 360px;
+      background: linear-gradient(135deg, #FFF3EC 0%, #FFE5D0 100%);
+      border-radius: 28px;
+      padding: 48px 36px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(242,101,34,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .product-emoji {
+      font-size: 80px;
+      display: block;
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+
+    .product-name-card {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .product-name-card span {
+      color: var(--orange);
+    }
+
+    .product-desc-card {
+      font-size: 13px;
+      color: var(--gray-mid);
+      line-height: 1.5;
+    }
+
+    .flavor-badges {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .flavor-badge {
+      background: white;
+      border-radius: 50px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-dark);
+      border: 1px solid #E8E8E8;
+    }
+
+    /* ── TRUST BAR ── */
+    .trust-bar {
+      padding: 28px 0;
+      border-top: 1px solid #EBEBEB;
+      border-bottom: 1px solid #EBEBEB;
+      background: var(--gray-light);
+    }
+
+    .trust-bar .container {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-dark);
+    }
+
+    .trust-icon {
+      font-size: 18px;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--orange);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--gray-mid);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    /* ── BENEFITS ── */
+    .benefits {
+      background: var(--white);
+    }
+
+    .benefits-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .benefits-header .section-sub {
+      margin: 0 auto;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .benefit-card {
+      background: var(--gray-light);
+      border-radius: var(--radius);
+      padding: 28px 22px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .benefit-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .benefit-card.highlight {
+      background: var(--orange);
+      color: white;
+    }
+
+    .benefit-icon {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 14px;
+      line-height: 1;
+    }
+
+    .benefit-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .benefit-card.highlight .benefit-title {
+      color: white;
+    }
+
+    .benefit-text {
+      font-size: 12px;
+      color: var(--gray-mid);
+      line-height: 1.55;
+    }
+
+    .benefit-card.highlight .benefit-text {
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* ── INGREDIENTS ── */
+    .ingredients {
+      background: var(--gray-light);
+    }
+
+    .ingredients .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .ingredients-info {
+      padding-top: 8px;
+    }
+
+    .ingredients-list {
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ingredient-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: white;
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .ingredient-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+
+    .ingredient-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 3px;
+      color: var(--black);
+    }
+
+    .ingredient-desc {
+      font-size: 12px;
+      color: var(--gray-mid);
+      line-height: 1.5;
+    }
+
+    /* RATIO VISUAL */
+    .ratio-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 36px 32px;
+    }
+
+    .ratio-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .ratio-sub {
+      font-size: 13px;
+      color: var(--gray-mid);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .ratio-bar-wrap {
+      margin-bottom: 24px;
+    }
+
+    .ratio-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .ratio-label-row .ca { color: var(--orange); }
+    .ratio-label-row .ph { color: #aaa; }
+
+    .ratio-bar {
+      display: flex;
+      border-radius: 50px;
+      overflow: hidden;
+      height: 14px;
+    }
+
+    .ratio-ca {
+      background: var(--orange);
+      flex: 1.2;
+      transition: flex 0.5s;
+    }
+
+    .ratio-ph {
+      background: #E0E0E0;
+      flex: 1;
+    }
+
+    .ratio-note {
+      font-size: 12px;
+      color: var(--gray-mid);
+      border-top: 1px solid #F0F0F0;
+      padding-top: 16px;
+      line-height: 1.5;
+    }
+
+    /* ALSO INCLUDE */
+    .also-include {
+      margin-top: 24px;
+    }
+
+    .also-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--gray-dark);
+    }
+
+    .also-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      background: var(--orange-light);
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 50px;
+    }
+
+    /* ── HOW TO USE ── */
+    .howto {
+      background: var(--black);
+      color: white;
+    }
+
+    .howto .section-title { color: white; }
+
+    .howto-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .howto-header .section-label { color: var(--orange); }
+    .howto-header .section-sub { color: rgba(255,255,255,0.55); margin: 0 auto; }
+
+    .howto-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .howto-card {
+      background: #1A1A1A;
+      border-radius: var(--radius);
+      padding: 32px 26px;
+      position: relative;
+    }
+
+    .howto-num {
+      font-size: 48px;
+      font-weight: 700;
+      color: #2A2A2A;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .howto-icon-wrap {
+      width: 48px;
+      height: 48px;
+      background: var(--orange);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .howto-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: white;
+    }
+
+    .howto-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+    }
+
+    .howto-text strong {
+      color: var(--orange);
+    }
+
+    /* ── WHO IT'S FOR ── */
+    .who {
+      background: var(--white);
+    }
+
+    .who .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .who-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .who-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--gray-dark);
+      line-height: 1.5;
+    }
+
+    .check-icon {
+      width: 22px;
+      height: 22px;
+      background: var(--orange-light);
+      color: var(--orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-weight: 700;
+    }
+
+    /* VISUAL BLOCK */
+    .who-visual {
+      background: linear-gradient(145deg, #FFF3EC, #FFE0CA);
+      border-radius: 24px;
+      padding: 48px 36px;
+      text-align: center;
+    }
+
+    .vet-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-dark);
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    .vet-badge .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--orange);
+      border-radius: 50%;
+    }
+
+    .who-visual p {
+      font-size: 15px;
+      color: var(--gray-mid);
+      line-height: 1.7;
+    }
+
+    .who-visual p strong {
+      color: var(--black);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--gray-light);
+      padding: 36px 0;
+      text-align: center;
+    }
+
+    footer .brand { margin-bottom: 8px; }
+
+    footer p {
+      font-size: 12px;
+      color: var(--gray-mid);
+      line-height: 1.7;
+    }
+
+    footer a {
+      color: var(--orange);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .hero .container,
+      .ingredients .container,
+      .who .container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .hero h1 { font-size: 30px; }
+
+      .benefits-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .howto-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stats { gap: 20px; }
+
+      .trust-bar .container { gap: 24px; }
+
+      section { padding: 56px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <div class="brand">dr.<span>felis</span></div>
+      <a href="https://m.drfelis.com" target="_blank" class="nav-cta">Order Now →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-text">
+        <div class="hero-badge">
+          <span>★</span> All-in-One Daily Supplement
+        </div>
+        <h1>
+          Everything Your Cat<br>
+          Needs, in <em>One Stick</em>
+        </h1>
+        <p class="hero-sub">
+          Perfect Care Stick is a vet-developed daily nutritional supplement for cats of all ages — supporting immunity, digestion, coat health, and kidney function in a single, palatable serving.
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-num">7+</span>
+            <div class="stat-label">Active Nutrients</div>
+          </div>
+          <div class="stat">
+            <span class="stat-num">2</span>
+            <div class="stat-label">Flavors</div>
+          </div>
+          <div class="stat">
+            <span class="stat-num">3mo+</span>
+            <div class="stat-label">Suitable from</div>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a href="https://m.drfelis.com" target="_blank" class="btn-primary">Shop Now</a>
+          <a href="#ingredients" class="btn-secondary">View Ingredients</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="product-card">
+          <span class="product-emoji">🐱</span>
+          <div class="product-name-card">Perfect Care <span>Stick</span></div>
+          <div class="product-desc-card">Daily All-in-One Supplement<br>for Cats · 30 Sticks / Box</div>
+          <div class="flavor-badges">
+            <span class="flavor-badge">🍗 Chicken</span>
+            <span class="flavor-badge">🐟 Salmon</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="container">
+      <div class="trust-item">
+        <span class="trust-icon">🏥</span>
+        <span>Vet-Developed Formula</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">✅</span>
+        <span>HACCP Certified</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🚫</span>
+        <span>No Artificial Sodium</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🌿</span>
+        <span>Natural Flavoring</span>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🐾</span>
+        <span>All Life Stages</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BENEFITS -->
+  <section class="benefits">
+    <div class="container">
+      <div class="benefits-header">
+        <div class="section-label">Why Perfect Care</div>
+        <h2 class="section-title">4 Essential Health Areas,<br>One Daily Dose</h2>
+        <p class="section-sub">
+          Most supplements address one concern. Perfect Care Stick was formulated to cover the four areas that matter most to feline health — simultaneously.
+        </p>
+      </div>
+
+      <div class="benefits-grid">
+        <div class="benefit-card highlight">
+          <span class="benefit-icon">🛡️</span>
+          <div class="benefit-title">Immune Support</div>
+          <div class="benefit-text">Fucoidan and key micronutrients strengthen the immune system and help your cat fight everyday stressors.</div>
+        </div>
+        <div class="benefit-card">
+          <span class="benefit-icon">🌿</span>
+          <div class="benefit-title">Gut Health</div>
+          <div class="benefit-text">Probiotics (L. plantarum) combined with GOS and FOS prebiotics promote a balanced digestive microbiome.</div>
+        </div>
+        <div class="benefit-card">
+          <span class="benefit-icon">✨</span>
+          <div class="benefit-title">Skin & Coat</div>
+          <div class="benefit-text">Omega-3 (EPA+DHA) and Vitamin B complex nourish skin from within, supporting a lustrous, healthy coat.</div>
+        </div>
+        <div class="benefit-card">
+          <span class="benefit-icon">⚡</span>
+          <div class="benefit-title">Vitality & Antioxidants</div>
+          <div class="benefit-text">Tocopherol and fucoidan provide antioxidant protection, supporting long-term energy and cellular health.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INGREDIENTS -->
+  <section class="ingredients" id="ingredients">
+    <div class="container">
+      <div class="ingredients-info">
+        <div class="section-label">Key Ingredients</div>
+        <h2 class="section-title">What's<br>Inside</h2>
+        <p class="section-sub">Science-backed ingredients, thoughtfully combined for optimal feline nutrition.</p>
+
+        <div class="ingredients-list">
+          <div class="ingredient-item">
+            <div class="ingredient-dot"></div>
+            <div>
+              <div class="ingredient-name">Omega-3 (EPA + DHA)</div>
+              <div class="ingredient-desc">Marine-sourced fatty acids for coat health, anti-inflammation, and cardiovascular support.</div>
+            </div>
+          </div>
+          <div class="ingredient-item">
+            <div class="ingredient-dot"></div>
+            <div>
+              <div class="ingredient-name">Lactiplantibacillus plantarum</div>
+              <div class="ingredient-desc">Evidence-based probiotic strain clinically studied for digestive balance in pets.</div>
+            </div>
+          </div>
+          <div class="ingredient-item">
+            <div class="ingredient-dot"></div>
+            <div>
+              <div class="ingredient-name">Fucoidan</div>
+              <div class="ingredient-desc">Brown seaweed-derived compound with antioxidant and immune-modulating properties.</div>
+            </div>
+          </div>
+          <div class="ingredient-item">
+            <div class="ingredient-dot"></div>
+            <div>
+              <div class="ingredient-name">Taurine</div>
+              <div class="ingredient-desc">An essential amino acid cats cannot synthesize — critical for heart health and vision.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="ratio-card">
+          <div class="ratio-title">Kidney-Friendly Ca:P Ratio</div>
+          <div class="ratio-sub">Formulated with a 1.2:1 calcium-to-phosphorus ratio — the clinically recommended range to support kidney health and reduce the risk of chronic kidney disease (CKD).</div>
+
+          <div class="ratio-bar-wrap">
+            <div class="ratio-label-row">
+              <span class="ca">Calcium · 1.2</span>
+              <span class="ph">Phosphorus · 1.0</span>
+            </div>
+            <div class="ratio-bar">
+              <div class="ratio-ca"></div>
+              <div class="ratio-ph"></div>
+            </div>
+          </div>
+
+          <div class="ratio-note">
+            Suitable for cats at all life stages. For cats with advanced kidney disease, veterinary guidance is recommended.
+          </div>
+        </div>
+
+        <div class="also-include">
+          <div class="also-title">Also Includes</div>
+          <div class="also-tags">
+            <span class="tag">Vitamin B Complex</span>
+            <span class="tag">Tocopherol (Vit. E)</span>
+            <span class="tag">GOS Prebiotic</span>
+            <span class="tag">FOS Prebiotic</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW TO USE -->
+  <section class="howto">
+    <div class="container">
+      <div class="howto-header">
+        <div class="section-label">How to Use</div>
+        <h2 class="section-title">Simple Daily Routine</h2>
+        <p class="section-sub">No mixing, no measuring. Perfect Care Stick is designed for real life.</p>
+      </div>
+
+      <div class="howto-grid">
+        <div class="howto-card">
+          <div class="howto-num">01</div>
+          <div class="howto-icon-wrap">🐾</div>
+          <div class="howto-title">Check Your Cat's Weight</div>
+          <div class="howto-text">
+            Under 3 kg → <strong>½ stick/day</strong><br>
+            3 kg or above → <strong>1 stick/day</strong>
+          </div>
+        </div>
+        <div class="howto-card">
+          <div class="howto-num">02</div>
+          <div class="howto-icon-wrap">🍽️</div>
+          <div class="howto-title">Serve Directly or Mix</div>
+          <div class="howto-text">Offer straight from the stick, or mix into regular food. Available in <strong>Chicken</strong> or <strong>Salmon</strong> flavor.</div>
+        </div>
+        <div class="howto-card">
+          <div class="howto-num">03</div>
+          <div class="howto-icon-wrap">📅</div>
+          <div class="howto-title">Once Daily, Every Day</div>
+          <div class="howto-text">Suitable from <strong>3 months of age</strong>. One box = 30 sticks = <strong>1 month supply</strong>.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="who">
+    <div class="container">
+      <div>
+        <div class="section-label">Ideal For</div>
+        <h2 class="section-title">Perfect for<br>Every Cat</h2>
+        <ul class="who-list">
+          <li>
+            <div class="check-icon">✓</div>
+            Kittens 3 months and older beginning daily nutrition
+          </li>
+          <li>
+            <div class="check-icon">✓</div>
+            Adult cats needing immune or digestive support
+          </li>
+          <li>
+            <div class="check-icon">✓</div>
+            Senior cats at higher risk for kidney and coat issues
+          </li>
+          <li>
+            <div class="check-icon">✓</div>
+            Cats with dull coats or irregular digestion
+          </li>
+          <li>
+            <div class="check-icon">✓</div>
+            Owners seeking a single, convenient daily supplement
+          </li>
+        </ul>
+      </div>
+
+      <div class="who-visual">
+        <div class="vet-badge">
+          <div class="dot"></div>
+          Developed by Dr. Kim Myung-chul, DVM
+        </div>
+        <p>
+          <strong>Dr.Felis</strong> was founded by a practicing veterinarian dedicated to bridging the gap between clinical nutrition science and everyday cat care.<br><br>
+          Perfect Care Stick is the result of years of feline health research — formulated to address the root causes of the most common health concerns seen in cats worldwide.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="brand">dr.<span style="color: var(--orange)">felis</span></div>
+      <p>
+        Manufactured in a HACCP-certified facility · No artificial sodium or flavor enhancers<br>
+        <a href="https://m.drfelis.com" target="_blank">m.drfelis.com</a> · Inquiries: contact Dr.Felis official channels
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

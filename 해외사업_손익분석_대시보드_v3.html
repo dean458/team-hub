@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해외사업 손익분석 마스터 v3 | Forcat · Felis · Dr.Felis</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#0c0e14;--surface:#141620;--surface2:#1c1f2e;--surface3:#252840;
+  --border:#2a2e42;--text:#e2e4ef;--text2:#8b90a8;--text3:#5a5f78;
+  --accent:#6c7cff;--accent2:#4e5bdb;--green:#34d399;--red:#f87171;
+  --orange:#fbbf24;--blue:#60a5fa;--purple:#a78bfa;--cyan:#22d3ee;--pink:#f472b6;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Pretendard',sans-serif;background:var(--bg);color:var(--text);font-size:12px;}
+button{cursor:pointer;font-family:inherit;font-size:12px;}
+input,select,textarea{font-family:inherit;font-size:12px;}
+
+/* Header */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.header h1{font-size:15px;font-weight:700;white-space:nowrap;}
+.header h1 span{color:var(--accent);}
+.header-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.hbtn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:5px 11px;border-radius:5px;transition:all .15s;white-space:nowrap;}
+.hbtn:hover{border-color:var(--accent);color:var(--text);}
+.hbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.hbtn.danger{border-color:var(--red);color:var(--red);}
+.hbtn.green{border-color:var(--green);color:var(--green);}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;padding:6px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:39px;z-index:49;}
+.tab{padding:7px 14px;border-radius:5px;border:none;background:transparent;color:var(--text2);font-weight:500;transition:all .15s;}
+.tab:hover{color:var(--text);background:var(--surface2);}
+.tab.active{background:var(--accent);color:#fff;}
+.section{display:none;}.section.active{display:block;}
+
+/* Column toggle bar */
+.col-bar{display:flex;gap:4px;padding:6px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;}
+.col-bar-label{font-size:10px;color:var(--text3);margin-right:4px;text-transform:uppercase;letter-spacing:.5px;}
+.col-chip{padding:4px 10px;border-radius:4px;font-size:10px;font-weight:500;border:1px solid var(--border);cursor:grab;user-select:none;transition:all .15s;}
+.col-chip.on{border-color:var(--accent);color:var(--text);}
+.col-chip.off{opacity:.4;color:var(--text3);}
+.col-chip:active{cursor:grabbing;}
+.col-chip.drag-over{border-color:var(--green);transform:scale(1.05);}
+
+/* Sheet */
+.sheet-wrap{padding:6px;overflow:auto;max-height:calc(100vh - 130px);}
+.sheet{border-collapse:collapse;white-space:nowrap;}
+.sheet th,.sheet td{border:1px solid var(--border);padding:3px 5px;min-width:55px;vertical-align:middle;}
+.sheet .sec-hdr th{font-weight:600;font-size:10px;text-align:center;letter-spacing:.3px;color:#fff;}
+.sheet .col-hdr th{font-weight:500;font-size:9px;text-align:center;color:var(--text2);background:var(--surface2);}
+.sheet td{background:var(--surface);font-size:11px;}
+.sheet td.ic{background:var(--surface2);}
+.sheet td.ac{color:var(--text2);}
+.sheet td.rc{font-weight:600;}
+.sheet td.num{text-align:right;font-variant-numeric:tabular-nums;}
+.sheet input.ci{background:transparent;border:none;color:var(--text);width:100%;text-align:right;padding:1px 0;font-size:11px;font-variant-numeric:tabular-nums;}
+.sheet input.ci:focus{outline:none;background:rgba(108,124,255,.12);}
+.sheet input.ci.blue{color:var(--blue);}
+.sheet .total-row td{background:var(--surface3);font-weight:700;border-top:2px solid var(--accent);}
+
+/* Section BGs */
+.bg-info{background:#1a3a5c;}.bg-qty{background:#1e4066;}.bg-exw{background:#0f2a4a;}
+.bg-export{background:#1a3c2a;}.bg-import{background:#4a3a0a;}.bg-ddp{background:#5a1a1a;}
+.bg-common{background:#2a1a3c;}.bg-logistics{background:#1a2a3c;}
+.bg-b1{background:#0a3a4a;}.bg-b2{background:#1a1a4c;}.bg-b3{background:#3a1a3c;}.bg-b4{background:#0a3a2a;}
+
+/* Settings - draggable cards */
+.settings-panel{padding:16px 20px;}
+.settings-grid{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;width:360px;min-width:300px;cursor:grab;transition:box-shadow .2s,opacity .2s;flex-shrink:0;}
+.scard.wide{width:760px;min-width:600px;}
+.scard:active{cursor:grabbing;}
+.scard.dragging{opacity:.5;box-shadow:0 8px 32px rgba(108,124,255,.3);}
+.scard.drag-target{border-color:var(--accent);box-shadow:0 0 0 2px rgba(108,124,255,.3);}
+.scard h3{font-size:12px;font-weight:600;margin-bottom:10px;color:var(--accent);display:flex;align-items:center;gap:6px;}
+.scard h3::before{content:'⠿';color:var(--text3);font-size:14px;}
+.srow{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.srow label{flex:0 0 130px;color:var(--text2);font-size:11px;}
+.srow input,.srow select{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:5px 7px;border-radius:4px;}
+.srow input:focus{outline:none;border-color:var(--accent);}
+.srow .unit{color:var(--text3);font-size:11px;flex:0 0 24px;}
+
+/* Guide table */
+.gtable{width:100%;border-collapse:collapse;margin-top:6px;font-size:10px;table-layout:fixed;}
+.gtable th,.gtable td{padding:5px 6px;text-align:center;border:1px solid var(--border);white-space:normal;word-break:keep-all;overflow-wrap:break-word;}
+.gtable th{background:var(--surface2);color:var(--text2);font-weight:500;}
+.gtable td{color:var(--text2);}
+.gtable td:first-child{text-align:left;color:var(--text);font-weight:500;width:90px;}
+.gtable td:last-child{width:110px;font-size:9px;}
+.gtable input.gedit{background:transparent;border:none;color:var(--text2);text-align:center;width:100%;font-size:10px;padding:0;}
+.gtable input.gedit:focus{outline:none;background:rgba(108,124,255,.12);color:var(--text);}
+
+/* KPI */
+.kpi-bar{display:flex;gap:10px;padding:12px 20px;flex-wrap:wrap;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;min-width:140px;}
+.kpi-label{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+.kpi-value{font-size:18px;font-weight:700;margin-top:2px;}
+.kpi-sub{font-size:9px;color:var(--text3);margin-top:2px;}
+
+/* Charts */
+.chart-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:0 20px 20px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.chart-card h3{font-size:12px;margin-bottom:10px;color:var(--text2);}
+.chart-container{position:relative;height:220px;}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:800px;width:95%;max-height:90vh;overflow-y:auto;}
+.modal h2{font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.modal .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.modal .fi{display:flex;flex-direction:column;gap:2px;}
+.modal .fi label{font-size:10px;color:var(--text2);}
+.modal .fi input,.modal .fi select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px;border-radius:5px;}
+.modal .fi input:focus{outline:none;border-color:var(--accent);}
+.modal-foot{display:flex;gap:6px;justify-content:flex-end;margin-top:14px;}
+
+/* Quote modal specifics */
+.quote-zone{border:2px dashed var(--border);border-radius:8px;padding:30px;text-align:center;color:var(--text2);cursor:pointer;transition:border-color .2s;margin-bottom:14px;}
+.quote-zone:hover,.quote-zone.dragover{border-color:var(--accent);color:var(--text);}
+.quote-preview{max-height:200px;overflow:auto;margin-bottom:12px;}
+.quote-preview table{width:100%;border-collapse:collapse;font-size:10px;}
+.quote-preview th,.quote-preview td{border:1px solid var(--border);padding:3px 6px;text-align:left;}
+.quote-preview th{background:var(--surface2);color:var(--text2);position:sticky;top:0;}
+.mapping-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;}
+.mapping-row label{flex:0 0 100px;color:var(--text2);}
+.mapping-row select{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:5px;border-radius:4px;}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#000;padding:9px 14px;border-radius:6px;font-size:12px;font-weight:500;z-index:200;transform:translateY(60px);opacity:0;transition:all .25s;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px;}
+
+@media(max-width:900px){.chart-row{grid-template-columns:1fr;}.scard,.scard.wide{width:100%;min-width:0;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>PnL</span> 발주·원가 분석 마스터 v3</h1>
+  <div class="header-right">
+    <button class="hbtn green" onclick="openQuoteModal()">📎 견적서 업로드</button>
+    <button class="hbtn" onclick="exportJSON()">JSON 백업</button>
+    <button class="hbtn" onclick="$id('importFile').click()">JSON 복원</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+    <button class="hbtn" onclick="exportCSV()">CSV 내보내기</button>
+    <button class="hbtn" onclick="$id('csvImportFile').click()">CSV 가져오기</button>
+    <input type="file" id="csvImportFile" accept=".csv" style="display:none" onchange="importCSV(event)">
+    <button class="hbtn primary" onclick="openAddModal()">+ 상품 추가</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="sheet">원가분석 시트</button>
+  <button class="tab" data-tab="dashboard">대시보드</button>
+  <button class="tab" data-tab="settings">설정</button>
+</div>
+
+<!-- ===== SHEET TAB ===== -->
+<div class="section active" id="sec-sheet">
+  <div class="col-bar" id="colBar"></div>
+  <div class="sheet-wrap"><table class="sheet" id="mainSheet"></table></div>
+</div>
+
+<!-- ===== DASHBOARD TAB ===== -->
+<div class="section" id="sec-dashboard">
+  <div class="kpi-bar" id="kpiBar"></div>
+  <div class="chart-row">
+    <div class="chart-card"><h3>SKU별 1개입 마진율</h3><div class="chart-container"><canvas id="chart1"></canvas></div></div>
+    <div class="chart-card"><h3>번들별 평균 마진율</h3><div class="chart-container"><canvas id="chart2"></canvas></div></div>
+    <div class="chart-card"><h3>원가 구성 비율</h3><div class="chart-container"><canvas id="chart3"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS TAB ===== -->
+<div class="section" id="sec-settings">
+  <div class="settings-panel">
+    <div class="settings-grid" id="settingsGrid"></div>
+  </div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-bg" id="addModal">
+  <div class="modal">
+    <h2 id="modalTitle">상품 추가</h2>
+    <input type="hidden" id="editId">
+    <div class="fg">
+      <div class="fi"><label>물류코드</label><input type="text" id="m_code" placeholder="DR10042"></div>
+      <div class="fi"><label>상품명</label><input type="text" id="m_name" placeholder="포켓츄 치킨 56g [4p]"></div>
+      <div class="fi"><label>카테고리</label><select id="m_category"><option>식품</option><option>용품</option><option>기타</option></select></div>
+      <div class="fi"><label>상태</label><input type="text" id="m_status" placeholder="재고보유, 출고요청일 + D7"></div>
+      <div class="fi"><label>통화</label><select id="m_currency"><option>YEN</option><option>USD</option><option>EUR</option></select></div>
+      <div class="fi"><label>소비기한(M)</label><input type="number" id="m_shelfLife" placeholder="50"></div>
+      <div class="fi"><label>개수/케이스</label><input type="number" id="m_pcsCase" placeholder="96"></div>
+      <div class="fi"><label>박스/팔레트</label><input type="number" id="m_boxPallet" placeholder="8"></div>
+      <div class="fi"><label>발주 박스</label><input type="number" id="m_orderBoxes" placeholder="400"></div>
+      <div class="fi"><label>개당 EXW (₩)</label><input type="number" id="m_exwUnit" step="1" placeholder="1097"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="hbtn" onclick="closeModal('addModal')">취소</button>
+      <button class="hbtn primary" onclick="saveProduct()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE UPLOAD MODAL -->
+<div class="modal-bg" id="quoteModal">
+  <div class="modal" style="max-width:900px;">
+    <h2>📎 견적서 업로드 → 원가 반영</h2>
+    <p style="color:var(--text2);font-size:11px;margin-bottom:12px;">제조사, 물류사, 3PL 업체 등의 견적서(CSV, TSV, 텍스트)를 업로드하면 원가 항목에 자동 매핑합니다.</p>
+
+    <div class="quote-zone" id="quoteZone" onclick="$id('quoteFile').click()">
+      <div style="font-size:24px;margin-bottom:8px;">📄</div>
+      <div>CSV/TSV 파일을 드래그하거나 클릭하여 업로드</div>
+      <div style="font-size:10px;margin-top:4px;">또는 아래 텍스트 영역에 직접 붙여넣기</div>
+    </div>
+    <input type="file" id="quoteFile" accept=".csv,.tsv,.txt,.xls" style="display:none" onchange="handleQuoteFile(event)">
+
+    <textarea id="quotePaste" rows="4" placeholder="여기에 견적서 내용을 직접 붙여넣기 (탭 또는 쉼표 구분)&#10;예: 항목,금액&#10;해상운임,111111&#10;통관대행비,22222" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;margin-bottom:10px;resize:vertical;" oninput="parseQuotePaste()"></textarea>
+
+    <div id="quotePreview" class="quote-preview" style="display:none;"></div>
+
+    <div id="quoteMapping" style="display:none;">
+      <h3 style="font-size:12px;color:var(--accent);margin:12px 0 8px;">칼럼 매핑</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;" id="quoteMappingGrid"></div>
+
+      <h3 style="font-size:12px;color:var(--accent);margin:12px 0 8px;">적용 대상 SKU</h3>
+      <div id="quoteTargetSkus"></div>
+
+      <div class="modal-foot">
+        <button class="hbtn" onclick="closeModal('quoteModal')">취소</button>
+        <button class="hbtn primary" onclick="applyQuote()">원가에 반영</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $id = id => document.getElementById(id);
+
+// ========== COLUMN GROUPS ==========
+const COL_GROUPS = [
+  { id:'info', label:'발주 기본', bg:'bg-info', default:true },
+  { id:'qty', label:'물량 정보', bg:'bg-qty', default:true },
+  { id:'exw', label:'EXW 단가', bg:'bg-exw', default:true },
+  { id:'export', label:'수출 원가', bg:'bg-export', default:true },
+  { id:'import', label:'수입원가/DDP', bg:'bg-import', default:true },
+  { id:'common', label:'판매 공통', bg:'bg-common', default:true },
+  { id:'logistics', label:'현지 물류비', bg:'bg-logistics', default:true },
+  { id:'b1', label:'1개입 Single', bg:'bg-b1', default:true },
+  { id:'b2', label:'2개입 Bundle', bg:'bg-b2', default:true },
+  { id:'b3', label:'3개입 Bundle', bg:'bg-b3', default:false },
+  { id:'b4', label:'4개입 Bundle', bg:'bg-b4', default:false },
+];
+
+// ========== STATE ==========
+let S = {
+  settings: {
+    fxJPY:9.55, fxUSD:1380, fxEUR:1500, fxCNY:190,
+    ecommRate:10.9, taxRate:10, mktRate:0, returnRate:0,
+    thirdPL:1500, delivery:2200, sub1:0, sub2:650, sub3:1200, sub4:1600,
+    guide:[
+      ['권장 판매가 할인율','기준(100%)','약 3~5%','약 7~10%','약 10~15%','소비자 체감 혜택 기준'],
+      ['MAP 설정 기준','MSRP ×85~90%','MSRP(2개) ×85%','MSRP(3개) ×83%','MSRP(4개) ×80%','최저가 노출 방어선'],
+      ['이커머스 수수료(식품)','~10.9%','~10.9%','~10.9%','~10.9%','카테고리별 상이'],
+      ['목표 최소 순이익률','≥20%','≥18%','≥16%','≥15%','DDP기준, 마케팅비 포함'],
+      ['마케팅비 기준','판매가×5%','판매가×4%','판매가×3%','판매가×3%','번들 효율성 반영'],
+      ['반품율 가정','2.0%','1.5%','1.0%','1.0%','번들=반품 의향 낮음'],
+      ['물류비(₩/건)','~2,000','~2,200','~2,500','~2,800','무게/부피에 따라 상이'],
+    ],
+    guideLogistics:[
+      ['3PL 출고비(₩/건)','고정동일','고정동일','고정동일','고정동일','수량무관, 건당고정'],
+      ['택배 배달료(₩/건)','고정동일','고정동일','고정동일','고정동일','수량무관, 건당고정'],
+      ['부자재 증분(₩)','0(기본)','약 +500~800','약 +1,000~1,500','약 +1,400~2,000','에어캡, 박스 업그레이드'],
+      ['총 물류비 계산','3PL+택배','3PL+택배+증분2','3PL+택배+증분3','3PL+택배+증분4','시트 순이익에 자동반영'],
+      ['참고 예시(₩)','3,700','4,350','4,900','5,300','3PL1,500+배달2,200기준'],
+    ],
+  },
+  products: [],
+  colOrder: COL_GROUPS.map(g => g.id),
+  colVisible: Object.fromEntries(COL_GROUPS.map(g => [g.id, g.default])),
+  settingsOrder: ['fx','sales','logistics','guide','data'],
+};
+
+// ========== PRODUCT ==========
+function newP(d={}) {
+  return {
+    id: d.id||'p_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    code:d.code||'', name:d.name||'', category:d.category||'식품', status:d.status||'',
+    currency:d.currency||'YEN', shelfLife:d.shelfLife||0,
+    pcsCase:d.pcsCase||0, boxPallet:d.boxPallet||0, orderBoxes:d.orderBoxes||0,
+    exwUnit:d.exwUnit||0,
+    cost_domesticLogistics:d.cost_domesticLogistics||0, cost_oceanFreight:d.cost_oceanFreight||0,
+    cost_insurance:d.cost_insurance||0, cost_customs:d.cost_customs||0,
+    cost_vat:d.cost_vat||0, cost_brokerage:d.cost_brokerage||0,
+    cost_inspection:d.cost_inspection||0, cost_labeling:d.cost_labeling||0,
+    cost_localTransport:d.cost_localTransport||0, cost_other:d.cost_other||0,
+    price1:d.price1||0, map1:d.map1||0, competitor1:d.competitor1||0,
+    price2:d.price2||0, map2:d.map2||0, competitor2:d.competitor2||0,
+    price3:d.price3||0, map3:d.map3||0, competitor3:d.competitor3||0,
+    price4:d.price4||0, map4:d.map4||0, competitor4:d.competitor4||0,
+  };
+}
+
+// ========== PERSISTENCE ==========
+function save(){localStorage.setItem('pnl_v3',JSON.stringify(S));}
+function load(){
+  const raw=localStorage.getItem('pnl_v3');
+  if(raw){
+    const p=JSON.parse(raw);
+    const defaults={...S.settings};
+    S.settings={...defaults,...(p.settings||{})};
+    // Ensure guide arrays exist
+    if(!Array.isArray(S.settings.guide)) S.settings.guide=defaults.guide;
+    if(!Array.isArray(S.settings.guideLogistics)) S.settings.guideLogistics=defaults.guideLogistics;
+    S.products=(p.products||[]).map(x=>({...newP(),...x}));
+    if(p.colOrder) S.colOrder=p.colOrder;
+    if(p.colVisible) S.colVisible={...S.colVisible,...p.colVisible};
+    if(p.settingsOrder) S.settingsOrder=p.settingsOrder;
+  }
+}
+
+// ========== CALCULATION ==========
+function getFx(c){return c==='YEN'?S.settings.fxJPY:c==='USD'?S.settings.fxUSD:c==='EUR'?S.settings.fxEUR:S.settings.fxJPY;}
+function sym(c){return c==='YEN'?'¥':c==='USD'?'$':c==='EUR'?'€':'¥';}
+
+const EXPORT_FIELDS=['cost_domesticLogistics','cost_oceanFreight','cost_insurance','cost_customs','cost_vat','cost_brokerage','cost_inspection','cost_labeling','cost_localTransport','cost_other'];
+const EXPORT_LABELS=['국내물류비','해상운임','해상보험료','관세','VAT','통관대행비','검사대행비','라벨링','현지운송비','기타'];
+
+// Cost field mapping for quote import
+const COST_FIELD_MAP = {
+  '국내물류':'cost_domesticLogistics','국내물류비':'cost_domesticLogistics','내수물류':'cost_domesticLogistics',
+  '해상운임':'cost_oceanFreight','운임':'cost_oceanFreight','freight':'cost_oceanFreight','ocean freight':'cost_oceanFreight',
+  '해상보험':'cost_insurance','보험':'cost_insurance','보험료':'cost_insurance','해상보험료':'cost_insurance','insurance':'cost_insurance',
+  '관세':'cost_customs','customs':'cost_customs','tariff':'cost_customs','duty':'cost_customs',
+  'vat':'cost_vat','부가세':'cost_vat','부가가치세':'cost_vat',
+  '통관':'cost_brokerage','통관대행':'cost_brokerage','통관대행비':'cost_brokerage','통관비':'cost_brokerage','brokerage':'cost_brokerage',
+  '검사':'cost_inspection','검사대행':'cost_inspection','검사대행비':'cost_inspection','검사비':'cost_inspection','inspection':'cost_inspection',
+  '라벨링':'cost_labeling','라벨':'cost_labeling','labeling':'cost_labeling','label':'cost_labeling',
+  '현지운송':'cost_localTransport','현지운송비':'cost_localTransport','현지물류':'cost_localTransport','local transport':'cost_localTransport',
+  '기타':'cost_other','기타비용':'cost_other','other':'cost_other',
+  'exw':'exwUnit','exw단가':'exwUnit','제조원가':'exwUnit','원가':'exwUnit',
+};
+
+function calc(p){
+  const fx=getFx(p.currency);
+  const totalEA=p.pcsCase*p.orderBoxes;
+  const exwPerBox=p.exwUnit*p.pcsCase;
+  const exwTotal=p.exwUnit*totalEA;
+  let exportTotal=0;
+  EXPORT_FIELDS.forEach(f=>exportTotal+=p[f]||0);
+  const importTotalKRW=exwTotal+exportTotal;
+  const importPerUnitKRW=totalEA>0?importTotalKRW/totalEA:0;
+  const ddp=fx>0?importPerUnitKRW/fx:0;
+
+  const bundles=[1,2,3,4].map(n=>{
+    const price=p['price'+n]||0;
+    const map=p['map'+n]||0;
+    const comp=p['competitor'+n]||0;
+    const subInc=[0,S.settings.sub1,S.settings.sub2,S.settings.sub3,S.settings.sub4][n]||0;
+    const logKRW=S.settings.thirdPL+S.settings.delivery+subInc;
+    const logFX=fx>0?logKRW/fx:0;
+    const costFX=ddp*n+logFX;
+    const ecomm=price*(S.settings.ecommRate/100);
+    const tax=price*(S.settings.taxRate/100);
+    const mkt=price*(S.settings.mktRate/100);
+    const ret=price*(S.settings.returnRate/100);
+    const profit=price-costFX-ecomm-tax-mkt-ret;
+    const margin=price>0?(profit/price)*100:0;
+    const disc=p.price1>0&&n>1?(1-price/(p.price1*n))*100:0;
+    return{n,price,map,comp,logKRW,logFX,costFX,ecomm,tax,mkt,ret,profit,margin,disc};
+  });
+
+  return{fx,totalEA,exwPerBox,exwTotal,exportTotal,importTotalKRW,importPerUnitKRW,ddp,bundles};
+}
+
+// ========== FORMAT ==========
+function fmt(n){return Math.round(n).toLocaleString('ko-KR');}
+function fD(n){return n.toLocaleString('ko-KR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fP(n){return n.toFixed(2)+'%';}
+
+// ========== TABS ==========
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    $id('sec-'+t.dataset.tab).classList.add('active');
+    if(t.dataset.tab==='dashboard')renderDashboard();
+    if(t.dataset.tab==='sheet')renderSheet();
+    if(t.dataset.tab==='settings')renderSettings();
+  });
+});
+
+function showToast(m){const t=$id('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function closeModal(id){$id(id).classList.remove('open');}
+
+// ========== COLUMN BAR (drag-to-reorder + toggle) ==========
+let dragChip=null;
+function renderColBar(){
+  const bar=$id('colBar');
+  bar.innerHTML='<span class="col-bar-label">칼럼 표시:</span>';
+  S.colOrder.forEach(gid=>{
+    const g=COL_GROUPS.find(x=>x.id===gid);if(!g)return;
+    const vis=S.colVisible[gid]!==false;
+    const chip=document.createElement('div');
+    chip.className='col-chip '+(vis?'on':'off');
+    chip.textContent=g.label;
+    chip.draggable=true;
+    chip.dataset.gid=gid;
+
+    chip.addEventListener('click',e=>{
+      if(e.detail===1){setTimeout(()=>{
+        if(!chip._wasDragged){S.colVisible[gid]=!vis;save();renderColBar();renderSheet();}
+      },200);}
+    });
+    chip.addEventListener('dragstart',e=>{dragChip=gid;chip._wasDragged=true;chip.style.opacity='.4';});
+    chip.addEventListener('dragend',()=>{dragChip=null;chip.style.opacity='';chip._wasDragged=false;bar.querySelectorAll('.col-chip').forEach(c=>c.classList.remove('drag-over'));});
+    chip.addEventListener('dragover',e=>{e.preventDefault();chip.classList.add('drag-over');});
+    chip.addEventListener('dragleave',()=>chip.classList.remove('drag-over'));
+    chip.addEventListener('drop',e=>{
+      e.preventDefault();chip.classList.remove('drag-over');
+      if(!dragChip||dragChip===gid)return;
+      const arr=[...S.colOrder];
+      const fi=arr.indexOf(dragChip),ti=arr.indexOf(gid);
+      arr.splice(fi,1);arr.splice(ti,0,dragChip);
+      S.colOrder=arr;save();renderColBar();renderSheet();
+    });
+    bar.appendChild(chip);
+  });
+}
+
+// ========== RENDER SHEET ==========
+function renderSheet(){
+  renderColBar();
+  const tbl=$id('mainSheet');
+  const vis=gid=>S.colVisible[gid]!==false;
+  const ordered=S.colOrder.filter(gid=>vis(gid));
+
+  let h1='<tr class="sec-hdr"><th rowspan="2" style="background:var(--surface2);min-width:70px;">관리</th>';
+  let h2='<tr class="col-hdr"><th style="display:none"></th>';
+
+  ordered.forEach(gid=>{
+    const g=COL_GROUPS.find(x=>x.id===gid);
+    if(gid==='info'){
+      h1+=`<th class="${g.bg}" colspan="4">발주 기본 정보</th>`;
+      h2+=`<th class="${g.bg}" style="min-width:180px">물류코드/상품명</th><th class="${g.bg}">카테고리</th><th class="${g.bg}">통화</th><th class="${g.bg}">상태</th>`;
+    } else if(gid==='qty'){
+      h1+=`<th class="${g.bg}" colspan="4">물량 정보</th>`;
+      h2+=`<th class="${g.bg}">개/케이스</th><th class="${g.bg}">박스/팔레트</th><th class="${g.bg}">발주박스</th><th class="${g.bg}">총EA</th>`;
+    } else if(gid==='exw'){
+      h1+=`<th class="${g.bg}" colspan="3">EXW 단가</th>`;
+      h2+=`<th class="${g.bg}">개당₩</th><th class="${g.bg}">박스당₩</th><th class="${g.bg}">총₩</th>`;
+    } else if(gid==='export'){
+      h1+=`<th class="${g.bg}" colspan="10">수출 원가 구성 (₩, 총액 입력)</th>`;
+      EXPORT_LABELS.forEach(l=>h2+=`<th class="${g.bg}">${l}</th>`);
+    } else if(gid==='import'){
+      h1+=`<th class="${g.bg}" colspan="3">수입원가 → DDP</th>`;
+      h2+=`<th class="${g.bg}">합계₩</th><th class="${g.bg}">개당₩</th><th class="bg-ddp" style="color:var(--red);font-weight:700">DDP단가</th>`;
+    } else if(gid==='common'){
+      h1+=`<th class="${g.bg}" colspan="4">판매 공통 설정</th>`;
+      h2+=`<th class="${g.bg}">이커머스${S.settings.ecommRate}%</th><th class="${g.bg}">소비세${S.settings.taxRate}%</th><th class="${g.bg}">마케팅${S.settings.mktRate}%</th><th class="${g.bg}">반품${S.settings.returnRate}%</th>`;
+    } else if(gid==='logistics'){
+      h1+=`<th class="${g.bg}" colspan="4">현지 물류비 (건당₩)</th>`;
+      h2+=`<th class="${g.bg}">1개입</th><th class="${g.bg}">2개입</th><th class="${g.bg}">3개입</th><th class="${g.bg}">4개입</th>`;
+    } else if(gid.startsWith('b')){
+      const n=parseInt(gid[1]);
+      const names=['','▶ 1개입 Single','▶ 2개입 Bundle×2','▶ 3개입 Bundle×3','▶ 4개입 Bundle×4'];
+      h1+=`<th class="${g.bg}" colspan="7">${names[n]}</th>`;
+      h2+=`<th class="${g.bg}">경쟁사</th><th class="${g.bg}">판매가</th><th class="${g.bg}">MAP</th><th class="${g.bg}">번들원가</th><th class="${g.bg}">순이익</th><th class="${g.bg}">마진율</th><th class="${g.bg}">${n>1?'할인율':'-'}</th>`;
+    }
+  });
+  h1+='</tr>'; h2+='</tr>';
+
+  let rows='';
+  let sumEA=0,sumExw=0,sumImport=0;
+
+  S.products.forEach(p=>{
+    const c=calc(p); const s=sym(p.currency);
+    sumEA+=c.totalEA; sumExw+=c.exwTotal; sumImport+=c.importTotalKRW;
+    let r='<tr>';
+    r+=`<td style="background:var(--surface2);text-align:center;white-space:nowrap;">
+      <button onclick="openAddModal('${p.id}')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:10px">수정</button>
+      <button onclick="dupP('${p.id}')" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:10px">복사</button>
+      <button onclick="delP('${p.id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:10px">삭제</button>
+    </td>`;
+
+    ordered.forEach(gid=>{
+      if(gid==='info'){
+        r+=`<td style="min-width:180px"><strong>${p.code}</strong><br><span style="color:var(--text2);font-size:10px">${p.name}</span></td>`;
+        r+=`<td>${p.category}</td><td>${p.currency}</td><td style="font-size:9px;color:var(--text2)">${p.status}</td>`;
+      } else if(gid==='qty'){
+        r+=`<td class="num">${fmt(p.pcsCase)}</td><td class="num">${fmt(p.boxPallet)}</td><td class="num">${fmt(p.orderBoxes)}</td><td class="num rc">${fmt(c.totalEA)}</td>`;
+      } else if(gid==='exw'){
+        r+=`<td class="num">${fmt(p.exwUnit)}</td><td class="num ac">${fmt(c.exwPerBox)}</td><td class="num ac">${fmt(c.exwTotal)}</td>`;
+      } else if(gid==='export'){
+        EXPORT_FIELDS.forEach(f=>{
+          r+=`<td class="ic num"><input class="ci blue" type="number" value="${p[f]||''}" onchange="uc('${p.id}','${f}',this.value)" placeholder="0"></td>`;
+        });
+      } else if(gid==='import'){
+        r+=`<td class="num ac">${fmt(c.importTotalKRW)}</td><td class="num ac">${fmt(c.importPerUnitKRW)}</td>`;
+        r+=`<td class="num rc" style="color:var(--red);font-weight:700">${s}${fD(c.ddp)}</td>`;
+      } else if(gid==='common'){
+        const b=c.bundles[0];
+        r+=`<td class="num ac">${s}${fD(b.ecomm)}</td><td class="num ac">${s}${fD(b.tax)}</td><td class="num ac">${s}${fD(b.mkt)}</td><td class="num ac">${s}${fD(b.ret)}</td>`;
+      } else if(gid==='logistics'){
+        for(let i=0;i<4;i++) r+=`<td class="num ac">${fmt(c.bundles[i].logKRW)}</td>`;
+      } else if(gid.startsWith('b')){
+        const n=parseInt(gid[1])-1;
+        const b=c.bundles[n]; const bn=n+1;
+        r+=`<td class="ic num"><input class="ci" type="number" value="${p['competitor'+bn]||''}" onchange="uc('${p.id}','competitor${bn}',this.value)" placeholder="0"></td>`;
+        r+=`<td class="ic num"><input class="ci blue" type="number" value="${p['price'+bn]||''}" onchange="uc('${p.id}','price${bn}',this.value)" placeholder="0" style="font-weight:600"></td>`;
+        r+=`<td class="ic num"><input class="ci" type="number" value="${p['map'+bn]||''}" onchange="uc('${p.id}','map${bn}',this.value)" placeholder="0"></td>`;
+        r+=`<td class="num ac">${b.price>0?s+fD(b.costFX):''}</td>`;
+        const pc=b.profit>0?'var(--green)':b.profit<0?'var(--red)':'';
+        r+=`<td class="num rc" style="color:${pc}">${b.price>0?s+fD(b.profit):''}</td>`;
+        const mc=b.margin>=20?'var(--green)':b.margin>=10?'var(--orange)':b.margin>0?'var(--orange)':'var(--red)';
+        r+=`<td class="num rc" style="color:${b.price>0?mc:''}">${b.price>0?fP(b.margin):''}</td>`;
+        r+=`<td class="num ac">${bn>1&&b.disc!==0?fP(b.disc):''}</td>`;
+      }
+    });
+    r+='</tr>'; rows+=r;
+  });
+
+  // Total
+  let tr='<tr class="total-row"><td style="background:var(--surface3)">합계/TOTAL</td>';
+  ordered.forEach(gid=>{
+    if(gid==='info') tr+='<td colspan="4"></td>';
+    else if(gid==='qty') tr+=`<td colspan="3"></td><td class="num">${fmt(sumEA)}</td>`;
+    else if(gid==='exw') tr+=`<td colspan="2"></td><td class="num">${fmt(sumExw)}</td>`;
+    else if(gid==='export'){
+      EXPORT_FIELDS.forEach(f=>{
+        const s=S.products.reduce((a,p)=>a+(p[f]||0),0);
+        tr+=`<td class="num">${s?fmt(s):''}</td>`;
+      });
+    } else if(gid==='import') tr+=`<td class="num">${fmt(sumImport)}</td><td colspan="2"></td>`;
+    else if(gid==='common') tr+='<td colspan="4"></td>';
+    else if(gid==='logistics') tr+='<td colspan="4"></td>';
+    else if(gid.startsWith('b')) tr+='<td colspan="7"></td>';
+  });
+  tr+='</tr>';
+
+  if(S.products.length===0){
+    const colCount=1+ordered.reduce((a,g)=>{
+      const counts={info:4,qty:4,exw:3,export:10,import:3,common:4,logistics:4,b1:7,b2:7,b3:7,b4:7};
+      return a+(counts[g]||0);
+    },0);
+    rows=`<tr><td colspan="${colCount}" style="text-align:center;padding:30px;color:var(--text2)">상품을 추가하거나 설정 탭에서 "샘플 데이터 불러오기"를 클릭하세요</td></tr>`;
+    tr='';
+  }
+
+  tbl.innerHTML='<thead>'+h1+h2+'</thead><tbody>'+rows+tr+'</tbody>';
+}
+
+// ========== INLINE UPDATE (debounced) ==========
+function uc(pid,field,val){
+  const p=S.products.find(x=>x.id===pid);if(!p)return;
+  p[field]=parseFloat(val)||0; save();
+  clearTimeout(uc._t); uc._t=setTimeout(renderSheet,250);
+}
+
+// ========== PRODUCT CRUD ==========
+function openAddModal(id){
+  $id('addModal').classList.add('open');
+  $id('editId').value=''; $id('modalTitle').textContent='상품 추가';
+  ['m_code','m_name','m_status','m_shelfLife','m_pcsCase','m_boxPallet','m_orderBoxes','m_exwUnit'].forEach(k=>$id(k).value='');
+  if(id){
+    const p=S.products.find(x=>x.id===id);
+    if(p){
+      $id('editId').value=p.id; $id('modalTitle').textContent='상품 수정';
+      $id('m_code').value=p.code; $id('m_name').value=p.name;
+      $id('m_category').value=p.category; $id('m_status').value=p.status;
+      $id('m_currency').value=p.currency; $id('m_shelfLife').value=p.shelfLife;
+      $id('m_pcsCase').value=p.pcsCase; $id('m_boxPallet').value=p.boxPallet;
+      $id('m_orderBoxes').value=p.orderBoxes; $id('m_exwUnit').value=p.exwUnit;
+    }
+  }
+}
+function saveProduct(){
+  const id=$id('editId').value;
+  const d={code:$id('m_code').value.trim(),name:$id('m_name').value.trim(),category:$id('m_category').value,
+    status:$id('m_status').value.trim(),currency:$id('m_currency').value,
+    shelfLife:+$id('m_shelfLife').value||0,pcsCase:+$id('m_pcsCase').value||0,
+    boxPallet:+$id('m_boxPallet').value||0,orderBoxes:+$id('m_orderBoxes').value||0,
+    exwUnit:+$id('m_exwUnit').value||0};
+  if(!d.code){alert('물류코드 필수');return;}
+  if(id){const i=S.products.findIndex(x=>x.id===id);if(i>=0)S.products[i]={...S.products[i],...d};}
+  else S.products.push(newP(d));
+  save();closeModal('addModal');renderSheet();showToast('저장 완료');
+}
+function delP(id){if(!confirm('삭제?'))return;S.products=S.products.filter(x=>x.id!==id);save();renderSheet();showToast('삭제 완료');}
+function dupP(id){
+  const s=S.products.find(x=>x.id===id);if(!s)return;
+  const d=newP({...JSON.parse(JSON.stringify(s)),id:undefined});d.code=s.code+'_copy';
+  S.products.push(d);save();renderSheet();showToast('복사 완료');
+}
+
+// ========== QUOTE UPLOAD ==========
+let quoteData=null; // {headers:[], rows:[[]]}
+
+function openQuoteModal(){
+  $id('quoteModal').classList.add('open');
+  $id('quotePaste').value='';
+  $id('quotePreview').style.display='none';
+  $id('quoteMapping').style.display='none';
+  quoteData=null;
+}
+
+// Drag & drop on zone
+const qz=$id('quoteZone');
+qz.addEventListener('dragover',e=>{e.preventDefault();qz.classList.add('dragover');});
+qz.addEventListener('dragleave',()=>qz.classList.remove('dragover'));
+qz.addEventListener('drop',e=>{
+  e.preventDefault();qz.classList.remove('dragover');
+  const file=e.dataTransfer.files[0];
+  if(file)readQuoteFile(file);
+});
+
+function handleQuoteFile(e){const f=e.target.files[0];if(f)readQuoteFile(f);}
+
+function readQuoteFile(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    $id('quotePaste').value=e.target.result;
+    parseQuoteText(e.target.result);
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function parseQuotePaste(){
+  const text=$id('quotePaste').value.trim();
+  if(text)parseQuoteText(text);
+}
+
+function parseQuoteText(text){
+  const lines=text.split('\n').filter(l=>l.trim());
+  if(lines.length<2){$id('quotePreview').style.display='none';$id('quoteMapping').style.display='none';return;}
+
+  // Detect delimiter
+  const delim=lines[0].includes('\t')?'\t':',';
+  const headers=lines[0].split(delim).map(h=>h.trim().replace(/^"|"$/g,''));
+  const rows=lines.slice(1).map(l=>l.split(delim).map(c=>c.trim().replace(/^"|"$/g,'')));
+
+  quoteData={headers,rows};
+
+  // Preview table
+  let html='<table><thead><tr>';
+  headers.forEach(h=>html+=`<th>${h}</th>`);
+  html+='</tr></thead><tbody>';
+  rows.slice(0,10).forEach(r=>{
+    html+='<tr>';r.forEach(c=>html+=`<td>${c}</td>`);html+='</tr>';
+  });
+  if(rows.length>10)html+=`<tr><td colspan="${headers.length}" style="color:var(--text3)">...외 ${rows.length-10}행</td></tr>`;
+  html+='</tbody></table>';
+  $id('quotePreview').innerHTML=html;
+  $id('quotePreview').style.display='block';
+
+  // Build mapping UI
+  buildMappingUI(headers);
+  $id('quoteMapping').style.display='block';
+}
+
+function buildMappingUI(headers){
+  const targetFields=[
+    {value:'',label:'-- 매핑 안함 --'},
+    {value:'code',label:'물류코드 (SKU 매칭용)'},
+    {value:'name',label:'상품명'},
+    {value:'exwUnit',label:'EXW 개당 단가 (₩)'},
+    {value:'cost_domesticLogistics',label:'국내물류비 (₩)'},
+    {value:'cost_oceanFreight',label:'해상운임 (₩)'},
+    {value:'cost_insurance',label:'해상보험료 (₩)'},
+    {value:'cost_customs',label:'관세 (₩)'},
+    {value:'cost_vat',label:'VAT (₩)'},
+    {value:'cost_brokerage',label:'통관대행비 (₩)'},
+    {value:'cost_inspection',label:'검사대행비 (₩)'},
+    {value:'cost_labeling',label:'라벨링 (₩)'},
+    {value:'cost_localTransport',label:'현지운송비 (₩)'},
+    {value:'cost_other',label:'기타비용 (₩)'},
+  ];
+
+  const grid=$id('quoteMappingGrid');
+  grid.innerHTML='';
+  headers.forEach((h,i)=>{
+    // Auto-detect mapping
+    const lh=h.toLowerCase().replace(/[\s_\-()₩¥%]/g,'');
+    let autoMap='';
+    for(const[k,v]of Object.entries(COST_FIELD_MAP)){
+      if(lh.includes(k.toLowerCase().replace(/[\s_]/g,''))){autoMap=v;break;}
+    }
+    if(lh.includes('물류코드')||lh.includes('sku')||lh.includes('code')||lh.includes('품번'))autoMap='code';
+    if(lh.includes('상품명')||lh.includes('품명')||lh.includes('product'))autoMap='name';
+
+    const row=document.createElement('div');
+    row.className='mapping-row';
+    row.innerHTML=`<label title="${h}">${h.length>14?h.slice(0,14)+'…':h}</label>
+      <select id="qmap_${i}">${targetFields.map(f=>`<option value="${f.value}" ${f.value===autoMap?'selected':''}>${f.label}</option>`).join('')}</select>`;
+    grid.appendChild(row);
+  });
+
+  // Target SKU checkboxes
+  const skuDiv=$id('quoteTargetSkus');
+  if(S.products.length===0){
+    skuDiv.innerHTML='<p style="color:var(--text3);font-size:11px">등록된 상품이 없습니다. 먼저 상품을 추가하세요.</p>';
+  } else {
+    skuDiv.innerHTML=`<label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;"><input type="checkbox" id="qAllSkus" onchange="toggleAllSkus(this.checked)" checked> 전체 선택</label>`;
+    skuDiv.innerHTML+=S.products.map(p=>`<label style="font-size:11px;display:inline-block;margin:2px 10px 2px 0;"><input type="checkbox" class="q-sku" value="${p.id}" checked> ${p.code}</label>`).join('');
+  }
+}
+
+function toggleAllSkus(checked){
+  document.querySelectorAll('.q-sku').forEach(cb=>cb.checked=checked);
+}
+
+function applyQuote(){
+  if(!quoteData){alert('견적서 데이터를 먼저 업로드하세요.');return;}
+
+  const mappings={};
+  quoteData.headers.forEach((h,i)=>{
+    const sel=$id('qmap_'+i);
+    if(sel&&sel.value)mappings[i]=sel.value;
+  });
+
+  if(Object.keys(mappings).length===0){alert('최소 하나의 칼럼을 매핑하세요.');return;}
+
+  const selectedSkus=[...document.querySelectorAll('.q-sku:checked')].map(cb=>cb.value);
+  if(selectedSkus.length===0){alert('적용할 SKU를 선택하세요.');return;}
+
+  // Check if there's a code column for matching
+  const codeColIdx=Object.entries(mappings).find(([i,v])=>v==='code');
+
+  let applied=0;
+
+  if(codeColIdx){
+    // Match by code
+    quoteData.rows.forEach(row=>{
+      const code=row[codeColIdx[0]]?.trim();
+      if(!code)return;
+      const product=S.products.find(p=>selectedSkus.includes(p.id)&&(p.code===code||p.code.includes(code)||code.includes(p.code)));
+      if(!product)return;
+      Object.entries(mappings).forEach(([i,field])=>{
+        if(field==='code'||field==='name')return;
+        const val=parseFloat(row[i]?.replace(/[,\s₩¥$]/g,''))||0;
+        if(val>0){product[field]=val;applied++;}
+      });
+    });
+  } else {
+    // No code column: apply first data row to all selected, or if multiple rows apply to each product
+    if(quoteData.rows.length===1){
+      // Single row → apply to all selected
+      selectedSkus.forEach(pid=>{
+        const p=S.products.find(x=>x.id===pid);if(!p)return;
+        Object.entries(mappings).forEach(([i,field])=>{
+          if(field==='code'||field==='name')return;
+          const val=parseFloat(quoteData.rows[0][i]?.replace(/[,\s₩¥$]/g,''))||0;
+          if(val>0){p[field]=val;applied++;}
+        });
+      });
+    } else {
+      // Try key-value format: first col = item name, second col = amount
+      // Detect if it's a vertical format (항목, 금액)
+      const nameIdx=Object.entries(mappings).find(([i,v])=>v==='name');
+      if(!nameIdx){
+        // Apply row by row to selected SKUs in order
+        selectedSkus.forEach((pid,idx)=>{
+          if(idx>=quoteData.rows.length)return;
+          const p=S.products.find(x=>x.id===pid);if(!p)return;
+          const row=quoteData.rows[idx];
+          Object.entries(mappings).forEach(([i,field])=>{
+            if(field==='code'||field==='name')return;
+            const val=parseFloat(row[i]?.replace(/[,\s₩¥$]/g,''))||0;
+            if(val>0){p[field]=val;applied++;}
+          });
+        });
+      } else {
+        // Vertical key-value: try auto-matching row names to cost fields
+        quoteData.rows.forEach(row=>{
+          const itemName=row[nameIdx[0]]?.trim().toLowerCase().replace(/[\s_\-()]/g,'');
+          let targetField=null;
+          for(const[k,v]of Object.entries(COST_FIELD_MAP)){
+            if(itemName&&itemName.includes(k.toLowerCase().replace(/[\s_]/g,''))){targetField=v;break;}
+          }
+          if(!targetField)return;
+          // Find amount column (first mapped numeric field)
+          const amtEntry=Object.entries(mappings).find(([i,v])=>v!=='code'&&v!=='name');
+          if(!amtEntry)return;
+          const val=parseFloat(row[amtEntry[0]]?.replace(/[,\s₩¥$]/g,''))||0;
+          if(val>0){
+            selectedSkus.forEach(pid=>{
+              const p=S.products.find(x=>x.id===pid);
+              if(p){p[targetField]=val;applied++;}
+            });
+          }
+        });
+      }
+    }
+  }
+
+  save();closeModal('quoteModal');renderSheet();
+  showToast(`견적서 반영 완료: ${applied}건 업데이트`);
+}
+
+// ========== SETTINGS (draggable cards) ==========
+const SETTINGS_CARDS = {
+  fx:{title:'기준 환율 (₩/1단위)', render:()=>`
+    <div class="srow"><label>JPY (엔화)</label><input type="number" id="set_fxJPY" step="0.01" value="${S.settings.fxJPY}" onchange="usave()"><span class="unit">₩</span></div>
+    <div class="srow"><label>USD (달러)</label><input type="number" id="set_fxUSD" step="0.1" value="${S.settings.fxUSD}" onchange="usave()"><span class="unit">₩</span></div>
+    <div class="srow"><label>EUR (유로)</label><input type="number" id="set_fxEUR" step="0.1" value="${S.settings.fxEUR}" onchange="usave()"><span class="unit">₩</span></div>
+    <div class="srow"><label>CNY (위안)</label><input type="number" id="set_fxCNY" step="0.1" value="${S.settings.fxCNY}" onchange="usave()"><span class="unit">₩</span></div>`},
+  sales:{title:'판매 공통 설정', render:()=>`
+    <div class="srow"><label>이커머스 수수료</label><input type="number" id="set_ecommRate" step="0.1" value="${S.settings.ecommRate}" onchange="usave()"><span class="unit">%</span></div>
+    <div class="srow"><label>소비세</label><input type="number" id="set_taxRate" step="0.1" value="${S.settings.taxRate}" onchange="usave()"><span class="unit">%</span></div>
+    <div class="srow"><label>마케팅 비율</label><input type="number" id="set_mktRate" step="0.1" value="${S.settings.mktRate}" onchange="usave()"><span class="unit">%</span></div>
+    <div class="srow"><label>반품율</label><input type="number" id="set_returnRate" step="0.1" value="${S.settings.returnRate}" onchange="usave()"><span class="unit">%</span></div>`},
+  logistics:{title:'현지 물류비 구조', render:()=>`
+    <div class="srow"><label>3PL 출고비 (₩/건)</label><input type="number" id="set_thirdPL" step="100" value="${S.settings.thirdPL}" onchange="usave()"><span class="unit">₩</span></div>
+    <div class="srow"><label>택배 배달료 (₩/건)</label><input type="number" id="set_delivery" step="100" value="${S.settings.delivery}" onchange="usave()"><span class="unit">₩</span></div>
+    <div class="srow"><label>부자재 증분 1개입</label><input type="number" id="set_sub1" step="100" value="${S.settings.sub1}" onchange="usave()"><span class="unit">₩</span></div>
+    <div class="srow"><label>부자재 증분 2개입</label><input type="number" id="set_sub2" step="100" value="${S.settings.sub2}" onchange="usave()"><span class="unit">₩</span></div>
+    <div class="srow"><label>부자재 증분 3개입</label><input type="number" id="set_sub3" step="100" value="${S.settings.sub3}" onchange="usave()"><span class="unit">₩</span></div>
+    <div class="srow"><label>부자재 증분 4개입</label><input type="number" id="set_sub4" step="100" value="${S.settings.sub4}" onchange="usave()"><span class="unit">₩</span></div>`},
+  guide:{title:'번들 가격 정책 가이드라인', wide:true, render:()=>{
+    function gt(arr,prefix){
+      return arr.map((row,ri)=>'<tr>'+row.map((cell,ci)=>`<td><input class="gedit" value="${cell}" onchange="uguide('${prefix}',${ri},${ci},this.value)"></td>`).join('')+'</tr>').join('');
+    }
+    return `<table class="gtable">
+      <thead><tr><th>구분</th><th>1개입</th><th>2개입</th><th>3개입</th><th>4개입</th><th>비고</th></tr></thead>
+      <tbody>${gt(S.settings.guide,'guide')}</tbody>
+    </table>
+    <button class="hbtn" onclick="addGuideRow('guide')" style="margin-top:6px;font-size:10px;">+ 행 추가</button>
+    <button class="hbtn danger" onclick="delGuideRow('guide')" style="margin-top:6px;font-size:10px;margin-left:4px;">- 마지막 행 삭제</button>
+    <div style="margin-top:10px;">
+      <p style="font-size:10px;color:var(--text2);margin-bottom:4px;">▶ 물류비 구조 가이드 (건당 고정 원가 분리)</p>
+      <table class="gtable">
+        <thead><tr><th>항목</th><th>1개입</th><th>2개입</th><th>3개입</th><th>4개입</th><th>비고</th></tr></thead>
+        <tbody>${gt(S.settings.guideLogistics,'guideLogistics')}</tbody>
+      </table>
+      <button class="hbtn" onclick="addGuideRow('guideLogistics')" style="margin-top:6px;font-size:10px;">+ 행 추가</button>
+      <button class="hbtn danger" onclick="delGuideRow('guideLogistics')" style="margin-top:6px;font-size:10px;margin-left:4px;">- 마지막 행 삭제</button>
+    </div>`;
+  }},
+  data:{title:'데이터 관리', render:()=>`
+    <button class="hbtn" onclick="loadSampleData()" style="margin-bottom:8px;width:100%">샘플 데이터 불러오기 (7개 SKU)</button>
+    <button class="hbtn danger" onclick="if(confirm('모든 데이터 삭제')){localStorage.removeItem('pnl_v3');location.reload();}" style="width:100%">전체 초기화</button>`},
+};
+
+let dragCard=null;
+function renderSettings(){
+  const grid=$id('settingsGrid');
+  grid.innerHTML='';
+  S.settingsOrder.forEach(cid=>{
+    const cfg=SETTINGS_CARDS[cid];if(!cfg)return;
+    const card=document.createElement('div');
+    card.className='scard'+(cfg.wide?' wide':'');
+    card.dataset.cid=cid;
+    card.draggable=true;
+    card.innerHTML=`<h3>${cfg.title}</h3>${cfg.render()}`;
+
+    card.addEventListener('dragstart',()=>{dragCard=cid;card.classList.add('dragging');});
+    card.addEventListener('dragend',()=>{dragCard=null;card.classList.remove('dragging');grid.querySelectorAll('.scard').forEach(c=>c.classList.remove('drag-target'));});
+    card.addEventListener('dragover',e=>{e.preventDefault();card.classList.add('drag-target');});
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-target'));
+    card.addEventListener('drop',e=>{
+      e.preventDefault();card.classList.remove('drag-target');
+      if(!dragCard||dragCard===cid)return;
+      const arr=[...S.settingsOrder];
+      const fi=arr.indexOf(dragCard),ti=arr.indexOf(cid);
+      arr.splice(fi,1);arr.splice(ti,0,dragCard);
+      S.settingsOrder=arr;save();renderSettings();
+    });
+    grid.appendChild(card);
+  });
+}
+
+function usave(){
+  ['fxJPY','fxUSD','fxEUR','fxCNY','ecommRate','taxRate','mktRate','returnRate','thirdPL','delivery','sub1','sub2','sub3','sub4'].forEach(k=>{
+    const el=$id('set_'+k);if(el)S.settings[k]=parseFloat(el.value)||0;
+  });
+  save();
+  clearTimeout(usave._t);usave._t=setTimeout(()=>{renderSheet();},200);
+}
+function uguide(key,ri,ci,val){S.settings[key][ri][ci]=val;save();}
+function addGuideRow(key){S.settings[key].push(['','','','','','']);save();renderSettings();}
+function delGuideRow(key){if(S.settings[key].length>1){S.settings[key].pop();save();renderSettings();}}
+
+// ========== DASHBOARD ==========
+let chart1,chart2,chart3;
+function renderDashboard(){
+  if(S.products.length===0){$id('kpiBar').innerHTML='<div class="kpi"><div class="kpi-value" style="font-size:13px;color:var(--text2)">시트에서 상품 추가 후 확인</div></div>';return;}
+  const cs=S.products.map(p=>({p,c:calc(p)}));
+  const tot=cs.reduce((a,x)=>a+x.c.totalEA,0);
+  const totImp=cs.reduce((a,x)=>a+x.c.importTotalKRW,0);
+  const v1=cs.filter(x=>x.c.bundles[0].price>0);
+  const avgM=v1.length>0?v1.reduce((a,x)=>a+x.c.bundles[0].margin,0)/v1.length:0;
+  const avgDDP=cs.reduce((a,x)=>a+x.c.ddp,0)/cs.length;
+
+  $id('kpiBar').innerHTML=`
+    <div class="kpi"><div class="kpi-label">SKU</div><div class="kpi-value">${S.products.length}</div></div>
+    <div class="kpi"><div class="kpi-label">총 발주수량</div><div class="kpi-value">${fmt(tot)} <span style="font-size:11px;color:var(--text2)">EA</span></div></div>
+    <div class="kpi"><div class="kpi-label">총 수입원가</div><div class="kpi-value">₩${fmt(totImp)}</div></div>
+    <div class="kpi"><div class="kpi-label">평균 DDP</div><div class="kpi-value" style="color:var(--red)">¥${fD(avgDDP)}</div></div>
+    <div class="kpi"><div class="kpi-label">1개입 평균마진</div><div class="kpi-value" style="color:${avgM>=15?'var(--green)':'var(--red)'}">${fP(avgM)}</div></div>`;
+
+  if(chart1)chart1.destroy();if(chart2)chart2.destroy();if(chart3)chart3.destroy();
+
+  chart1=new Chart($id('chart1'),{type:'bar',data:{labels:v1.map(x=>x.p.code),datasets:[{label:'마진율%',data:v1.map(x=>x.c.bundles[0].margin),backgroundColor:v1.map(x=>x.c.bundles[0].margin>=15?'#34d399':x.c.bundles[0].margin>=0?'#fbbf24':'#f87171'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#8b90a8',callback:v=>v+'%'},grid:{color:'#2a2e42'}},x:{ticks:{color:'#8b90a8',maxRotation:45},grid:{display:false}}}}});
+
+  const ba=[1,2,3,4].map(n=>{const v=cs.filter(x=>x.c.bundles[n-1].price>0);return v.length>0?v.reduce((a,x)=>a+x.c.bundles[n-1].margin,0)/v.length:0;});
+  chart2=new Chart($id('chart2'),{type:'bar',data:{labels:['1개입','2개입','3개입','4개입'],datasets:[{label:'평균마진%',data:ba,backgroundColor:['#22d3ee','#6c7cff','#a78bfa','#34d399'],borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#8b90a8',callback:v=>v+'%'},grid:{color:'#2a2e42'}},x:{ticks:{color:'#8b90a8'},grid:{display:false}}}}});
+
+  const cl=['EXW','국내물류','해상운임','보험','관세','VAT','통관','검사','라벨링','현지운송','기타'];
+  const ck=[null,...EXPORT_FIELDS];
+  const cv=ck.map((k,i)=>i===0?cs.reduce((a,x)=>a+x.c.exwTotal,0):S.products.reduce((a,p)=>a+(p[k]||0),0));
+  const clf=cl.filter((_,i)=>cv[i]>0);const cvf=cv.filter(v=>v>0);
+  const co=['#6c7cff','#34d399','#f87171','#fbbf24','#60a5fa','#a78bfa','#fb923c','#f472b6','#2dd4bf','#e879f9','#84cc16'];
+  chart3=new Chart($id('chart3'),{type:'doughnut',data:{labels:clf,datasets:[{data:cvf,backgroundColor:co.slice(0,cvf.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8b90a8',font:{size:10},padding:5}}}}});
+}
+
+// ========== EXPORT ==========
+function exportJSON(){
+  const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=`PnL_v3_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  showToast('JSON 백업 완료');
+}
+function importJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{S=JSON.parse(ev.target.result);save();location.reload();}catch(e){alert('유효하지 않은 파일');}};
+  r.readAsText(f);
+}
+// CSV column definitions - used for both export and import
+const CSV_COLS=[
+  {h:'물류코드',f:'code',type:'str'},
+  {h:'상품명',f:'name',type:'str'},
+  {h:'카테고리',f:'category',type:'str'},
+  {h:'통화',f:'currency',type:'str'},
+  {h:'상태',f:'status',type:'str'},
+  {h:'개수/케이스',f:'pcsCase',type:'num'},
+  {h:'박스/팔레트',f:'boxPallet',type:'num'},
+  {h:'발주박스',f:'orderBoxes',type:'num'},
+  {h:'EXW개당(₩)',f:'exwUnit',type:'num'},
+  {h:'국내물류비(₩)',f:'cost_domesticLogistics',type:'num'},
+  {h:'해상운임(₩)',f:'cost_oceanFreight',type:'num'},
+  {h:'해상보험료(₩)',f:'cost_insurance',type:'num'},
+  {h:'관세(₩)',f:'cost_customs',type:'num'},
+  {h:'VAT(₩)',f:'cost_vat',type:'num'},
+  {h:'통관대행비(₩)',f:'cost_brokerage',type:'num'},
+  {h:'검사대행비(₩)',f:'cost_inspection',type:'num'},
+  {h:'라벨링(₩)',f:'cost_labeling',type:'num'},
+  {h:'현지운송비(₩)',f:'cost_localTransport',type:'num'},
+  {h:'기타(₩)',f:'cost_other',type:'num'},
+  {h:'1개입_경쟁사',f:'competitor1',type:'num'},
+  {h:'1개입_판매가',f:'price1',type:'num'},
+  {h:'1개입_MAP',f:'map1',type:'num'},
+  {h:'2개입_경쟁사',f:'competitor2',type:'num'},
+  {h:'2개입_판매가',f:'price2',type:'num'},
+  {h:'2개입_MAP',f:'map2',type:'num'},
+  {h:'3개입_경쟁사',f:'competitor3',type:'num'},
+  {h:'3개입_판매가',f:'price3',type:'num'},
+  {h:'3개입_MAP',f:'map3',type:'num'},
+  {h:'4개입_경쟁사',f:'competitor4',type:'num'},
+  {h:'4개입_판매가',f:'price4',type:'num'},
+  {h:'4개입_MAP',f:'map4',type:'num'},
+  // Auto-calc columns (export only, ignored on import)
+  {h:'[자동]총EA',f:'_totalEA',type:'auto'},
+  {h:'[자동]EXW총(₩)',f:'_exwTotal',type:'auto'},
+  {h:'[자동]수입원가(₩)',f:'_importKRW',type:'auto'},
+  {h:'[자동]DDP단가',f:'_ddp',type:'auto'},
+  {h:'[자동]1개입_순이익',f:'_profit1',type:'auto'},
+  {h:'[자동]1개입_마진율',f:'_margin1',type:'auto'},
+  {h:'[자동]2개입_순이익',f:'_profit2',type:'auto'},
+  {h:'[자동]2개입_마진율',f:'_margin2',type:'auto'},
+  {h:'[자동]3개입_순이익',f:'_profit3',type:'auto'},
+  {h:'[자동]3개입_마진율',f:'_margin3',type:'auto'},
+  {h:'[자동]4개입_순이익',f:'_profit4',type:'auto'},
+  {h:'[자동]4개입_마진율',f:'_margin4',type:'auto'},
+];
+
+function csvEsc(v){const s=String(v);return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s;}
+
+function exportCSV(){
+  const headers=CSV_COLS.map(c=>c.h);
+  const rows=S.products.map(p=>{
+    const c=calc(p);
+    return CSV_COLS.map(col=>{
+      if(col.type==='auto'){
+        if(col.f==='_totalEA') return c.totalEA;
+        if(col.f==='_exwTotal') return c.exwTotal;
+        if(col.f==='_importKRW') return Math.round(c.importTotalKRW);
+        if(col.f==='_ddp') return c.ddp.toFixed(2);
+        const m=col.f.match(/_profit(\d)/);if(m) return c.bundles[m[1]-1].profit.toFixed(2);
+        const m2=col.f.match(/_margin(\d)/);if(m2) return c.bundles[m2[1]-1].margin.toFixed(2)+'%';
+        return '';
+      }
+      return p[col.f]??'';
+    });
+  });
+  let csv='\uFEFF'+headers.map(csvEsc).join(',')+'\n';
+  rows.forEach(r=>csv+=r.map(csvEsc).join(',')+'\n');
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=`PnL_v3_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  showToast('CSV 내보내기 완료 (엑셀에서 편집 후 재업로드 가능)');
+}
+
+function importCSV(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const text=ev.target.result;
+    const lines=text.replace(/^\uFEFF/,'').split('\n');
+    if(lines.length<2){alert('유효한 CSV가 아닙니다.');return;}
+
+    // Parse all lines
+    const allRows=lines.map(l=>parseCSVLine(l));
+
+    // Strategy 1: Try HTML tool's own format (header row has "물류코드")
+    const h0=allRows[0];
+    const ownFormat=h0.some(c=>c.trim()==='물류코드');
+    if(ownFormat){
+      importOwnCSV(allRows);
+    } else {
+      // Strategy 2: External Excel CSV - auto-detect data rows
+      importExternalCSV(allRows);
+    }
+
+    save();renderSheet();
+    e.target.value='';
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function importOwnCSV(allRows){
+  const headers=allRows[0];
+  const colMap={};
+  const editableCols=CSV_COLS.filter(c=>c.type!=='auto');
+  headers.forEach((h,i)=>{
+    const clean=h.trim().replace(/^\[자동\]/,'');
+    const match=editableCols.find(c=>c.h===h.trim()||c.h===clean);
+    if(match) colMap[i]=match;
+  });
+  const codeIdx=Object.entries(colMap).find(([i,c])=>c.f==='code');
+  if(!codeIdx){alert('물류코드 칼럼을 찾을 수 없습니다.');return;}
+
+  let updated=0,created=0;
+  for(let li=1;li<allRows.length;li++){
+    const cells=allRows[li];
+    if(cells.length<2)continue;
+    const code=cells[codeIdx[0]]?.trim();
+    if(!code)continue;
+    let p=S.products.find(x=>x.code===code);
+    if(!p){p=newP({code});S.products.push(p);created++;}else updated++;
+    Object.entries(colMap).forEach(([i,col])=>{
+      const val=cells[i]?.trim();
+      if(val===undefined||val==='')return;
+      if(col.type==='num'){const num=parseFloat(val.replace(/[,\s₩¥$%]/g,''));if(!isNaN(num))p[col.f]=num;}
+      else p[col.f]=val;
+    });
+  }
+  showToast(`CSV 가져오기 완료: ${updated}개 갱신, ${created}개 신규`);
+}
+
+// External Excel CSV mapping: detect product code pattern and map by column position
+// Supports the "발주 현황 및 원가 분석 마스터" Excel template
+const EXCEL_COL_MAP=[
+  // idx, field, type
+  // 0:발주일자, 1:발주번호 - skip
+  [2,'code','str'],      // 품목코드
+  [3,'name','str'],      // 상품명
+  [4,'category','str'],  // 카테고리
+  [5,'status','str'],    // 상태
+  [6,'currency','str'],  // 통화
+  // 7: 소비기한(M) - skip (or shelfLife)
+  // 8 or 9: 개수/박스 depends on whether 소비기한 has value
+];
+
+function importExternalCSV(allRows){
+  // Find data rows: rows where column index 2 or nearby has a product code like DR10042, FC-, DF-
+  const codePattern=/^[A-Z]{2,3}\d{4,}/;
+  let codeColIdx=-1;
+  let dataStartRow=-1;
+
+  // Scan rows to find where data begins and which column has product codes
+  for(let ri=0;ri<allRows.length;ri++){
+    const row=allRows[ri];
+    for(let ci=0;ci<Math.min(row.length,6);ci++){
+      const val=row[ci]?.trim();
+      if(val&&codePattern.test(val)){
+        codeColIdx=ci;
+        dataStartRow=ri;
+        break;
+      }
+    }
+    if(dataStartRow>=0)break;
+  }
+
+  if(dataStartRow<0){
+    // Fallback: look for any row with what looks like product data
+    for(let ri=0;ri<allRows.length;ri++){
+      const row=allRows[ri];
+      // Check if row has numbers that look like prices/quantities
+      const hasNumbers=row.filter(c=>/^\d[\d,]*\.?\d*$/.test(c?.trim().replace(/"/g,''))).length>=3;
+      const hasText=row.filter(c=>c?.trim()&&!/^[\d,.\-%]+$/.test(c.trim())).length>=2;
+      if(hasNumbers&&hasText){
+        // Try to find a code-like value
+        for(let ci=0;ci<Math.min(row.length,6);ci++){
+          const v=row[ci]?.trim();
+          if(v&&v.length>=4&&/[A-Z]/.test(v)&&/\d/.test(v)){
+            codeColIdx=ci;dataStartRow=ri;break;
+          }
+        }
+        if(dataStartRow>=0)break;
+      }
+    }
+  }
+
+  if(dataStartRow<0){alert('상품 데이터를 찾을 수 없습니다. 품목코드(예: DR10042)가 포함된 행이 필요합니다.');return;}
+
+  // Build column mapping based on detected code column position
+  // The Excel template has a known structure relative to the code column
+  const cc=codeColIdx; // code column offset
+  const colDef=[
+    [cc,'code','str'],
+    [cc+1,'name','str'],
+    [cc+2,'category','str'],
+    [cc+3,'status','str'],
+    [cc+4,'currency','str'],
+    // cc+5: 소비기한 - skip
+  ];
+
+  // Find numeric columns: scan the first data row to detect column positions
+  const sampleRow=allRows[dataStartRow];
+
+  // After currency, find the first sequence of numeric columns
+  // Pattern: ..., 개수/박스, 박스/팔레트, 발주박스, 발주총EA, 개당KRW, ...
+  // We need to find where numeric data starts after the text columns
+  let numStart=-1;
+  for(let ci=cc+4;ci<sampleRow.length;ci++){
+    const v=sampleRow[ci]?.trim().replace(/"/g,'').replace(/,/g,'');
+    if(v&&/^\d+\.?\d*$/.test(v)){numStart=ci;break;}
+  }
+
+  if(numStart<0){
+    // Try broader search
+    for(let ci=cc+5;ci<sampleRow.length;ci++){
+      const v=sampleRow[ci]?.trim().replace(/"/g,'').replace(/,/g,'');
+      if(v&&parseFloat(v)>0){numStart=ci;break;}
+    }
+  }
+
+  if(numStart>=0){
+    // Map known positions relative to numStart
+    // Expected: [shelfLife], pcsCase, boxPallet, orderBoxes, totalEA(auto), exwUnit, ...
+    // But the exact offset depends on whether there's a shelfLife column
+    // Let's try to detect: count from numStart
+    // In the Excel: col8=소비기한, col9=개수/박스, col10=박스/팔레트, col11=발주박스, col12=발주총EA, col13=개당KRW
+    // So numStart likely points to 소비기한(50) or 개수/박스(96)
+
+    // Detect layout by examining the data row values
+    // In the Excel template, from code column (cc):
+    // cc+0:code, +1:name, +2:category, +3:status, +4:currency, +5:empty?, +6:shelfLife?
+    // then: pcsCase, boxPallet, orderBoxes, exwUnit, boxPrice(auto), totalPrice(auto)
+    // then: 10 export costs, 3 import(auto), 4 sales%, 6 logistics, bundles...
+    //
+    // We detect by finding exwUnit: it's typically 1000~5000 range for pet food
+    // The sequence is: pcsCase(~96), boxPallet(~8), orderBoxes(~400), exwUnit(~1097)
+    // Or sometimes: shelfLife(~25-50), pcsCase, boxPallet, orderBoxes, exwUnit
+
+    // Direct position mapping based on verified Excel column structure:
+    // col[cc+6]=shelfLife or empty, then numeric columns start
+    // Verified: idx8=shelfLife(50), idx9=pcsCase(96), idx10=boxPallet(8), idx11=orderBoxes(400)
+    // idx12=exwUnit(1097), idx13=boxPrice(auto), idx14=totalPrice(auto)
+    // idx15~24=exportCosts(10), idx25~27=importAuto(3)
+    // idx28~31=salesSettings(4), idx32~37=logisticsSettings(6)
+    // idx38=competitor1, idx39=priceP1, idx40=mapP1, idx41=profitP1(auto), idx42=marginP1(auto)
+    // idx43=competitor2, idx44=priceP2, idx45=mapP2...
+
+    // Use absolute indices from the code column
+    const o=cc; // base offset = code column index (typically 2)
+
+    colDef.push(
+      [o+7,'pcsCase','num'],          // 개수/박스 (idx 9 when cc=2)
+      [o+8,'boxPallet','num'],        // 박스/팔레트
+      [o+9,'orderBoxes','num'],       // 발주박스
+      // o+10: 발주총EA (auto, skip)
+      [o+10,'exwUnit','num'],         // 개당(KRW)
+      // o+11: 박스당(auto), o+12: 발주총(auto)
+    );
+
+    // But wait - need to verify. Let's be adaptive:
+    // Find exwUnit by looking for the value around 500~10000 after orderBoxes
+    // The pattern is: small(pcsCase ~72-96), small(boxPallet ~6-8), medium(orderBoxes ~150-400), medium(exwUnit ~1000-5000)
+    // We already found numStart. Let's trace from there.
+
+    const firstVal=parseFloat(sampleRow[numStart]?.trim().replace(/[",]/g,''))||0;
+    let ns=numStart;
+    if(firstVal>0&&firstVal<=60) ns++; // skip shelfLife if present
+
+    // ns = pcsCase position now
+    colDef.length=colDef.filter(([ci])=>ci<ns).length; // remove previous numeric mappings
+    colDef.push(
+      [ns,'pcsCase','num'],       // 개수/박스
+      [ns+1,'boxPallet','num'],   // 박스/팔레트
+      [ns+2,'orderBoxes','num'],  // 발주박스
+      // ns+3: 발주총EA (auto) - but in some templates this doesn't exist
+    );
+
+    // Find exwUnit: it's the first value after orderBoxes that's > 100 and looks like a unit price
+    // Check ns+3: if it equals pcsCase*orderBoxes, it's totalEA(auto), exwUnit is ns+4
+    const nsP3=parseFloat(sampleRow[ns+3]?.trim().replace(/[",]/g,''))||0;
+    const pcs=parseFloat(sampleRow[ns]?.trim().replace(/[",]/g,''))||0;
+    const boxes=parseFloat(sampleRow[ns+2]?.trim().replace(/[",]/g,''))||0;
+    const isTotalEA=(nsP3===pcs*boxes);
+
+    let exwIdx=isTotalEA?ns+4:ns+3;
+    colDef.push([exwIdx,'exwUnit','num']);
+
+    // After exwUnit: boxPrice(auto), totalPrice(auto) = 2 auto columns
+    // Then 10 export cost columns
+    const exportStart=exwIdx+3; // skip exwUnit, boxPrice(auto), totalPrice(auto)
+    const exportFields=['cost_domesticLogistics','cost_oceanFreight','cost_insurance',
+      'cost_customs','cost_vat','cost_brokerage','cost_inspection','cost_labeling',
+      'cost_localTransport','cost_other'];
+    exportFields.forEach((f,i)=>colDef.push([exportStart+i,f,'num']));
+
+    // After 10 export costs: 3 auto(수입원가합계,개당,DDP) + 4 settings(이커머스%,소비세%,마케팅%,반품%)
+    // + 6 settings(3PL,택배,부자재1~4)
+    // = 13 columns to skip
+    const bundleStart=exportStart+10+3+4+6; // = exportStart + 23
+
+    // Bundle 1: 경쟁사,판매가,MAP,순이익(auto),마진율(auto) = 5 cols
+    colDef.push(
+      [bundleStart,'competitor1','num'],
+      [bundleStart+1,'price1','num'],
+      [bundleStart+2,'map1','num'],
+    );
+    // Bundle 2: after 5 cols from bundle1 start
+    // 경쟁사2,판매가P2,MAP P2,할인%(auto),원가(auto),순이익(auto),마진%(auto) = 7 cols
+    const b2=bundleStart+5;
+    colDef.push([b2,'competitor2','num'],[b2+1,'price2','num'],[b2+2,'map2','num']);
+    const b3=b2+7;
+    colDef.push([b3,'competitor3','num'],[b3+1,'price3','num'],[b3+2,'map3','num']);
+    const b4=b3+7;
+    colDef.push([b4,'competitor4','num'],[b4+1,'price4','num'],[b4+2,'map4','num']);
+  }
+
+  // Extract data rows
+  let updated=0,created=0;
+  for(let ri=dataStartRow;ri<allRows.length;ri++){
+    const row=allRows[ri];
+    const code=row[cc]?.trim();
+    if(!code||!codePattern.test(code))continue; // skip non-data rows
+    if(code.startsWith('합계'))continue;
+
+    let p=S.products.find(x=>x.code===code);
+    if(!p){p=newP({code});S.products.push(p);created++;}else updated++;
+
+    colDef.forEach(([ci,field,type])=>{
+      if(ci>=row.length)return;
+      const raw=row[ci]?.trim();
+      if(!raw)return;
+      if(type==='num'){
+        const num=parseFloat(raw.replace(/[,\s₩¥$%"]/g,''));
+        if(!isNaN(num)&&num!==0) p[field]=num;
+      } else {
+        if(raw) p[field]=raw;
+      }
+    });
+  }
+
+  showToast(`외부 CSV 가져오기 완료: ${updated}개 갱신, ${created}개 신규`);
+}
+
+// Proper CSV line parser (handles quoted fields with commas)
+function parseCSVLine(line){
+  const result=[];let current='';let inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(inQuotes){
+      if(ch==='"'&&line[i+1]==='"'){current+='"';i++;}
+      else if(ch==='"'){inQuotes=false;}
+      else{current+=ch;}
+    } else {
+      if(ch==='"'){inQuotes=true;}
+      else if(ch===','){result.push(current);current='';}
+      else{current+=ch;}
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+// ========== SAMPLE DATA ==========
+function loadSampleData(){
+  if(S.products.length>0&&!confirm('기존 데이터를 대체합니다.'))return;
+  S.products=[
+    newP({code:'DR10042',name:'(제품) 포켓츄 치킨 56g [4p]',category:'식품',status:'재고보유, 출고요청일+D7',currency:'YEN',shelfLife:50,pcsCase:96,boxPallet:8,orderBoxes:400,exwUnit:1097,cost_domesticLogistics:66667,cost_oceanFreight:111111,cost_insurance:4444,cost_brokerage:22222,competitor1:10000,price1:2770}),
+    newP({code:'DR10043',name:'(제품) 포켓츄 참치 56g [4p]',category:'식품',status:'재고보유, 출고요청일+D7',currency:'YEN',shelfLife:50,pcsCase:96,boxPallet:8,orderBoxes:400,exwUnit:1010,cost_domesticLogistics:66667,cost_oceanFreight:111111,cost_insurance:4444,cost_brokerage:22222,competitor1:10000,price1:2770}),
+    newP({code:'DR10044',name:'(제품) 포켓츄 연어 56g [4p]',category:'식품',status:'재고보유, 출고요청일+D7',currency:'YEN',shelfLife:50,pcsCase:96,boxPallet:8,orderBoxes:400,exwUnit:1032,cost_domesticLogistics:66667,cost_oceanFreight:111111,cost_insurance:4444,cost_brokerage:22222,competitor1:10000,price1:2770}),
+    newP({code:'DR10063',name:'(제품) 데일리솔루션 퍼펙트 치킨 150g [15p]',category:'식품',status:'26/05/06이후 재고확보',currency:'YEN',shelfLife:25,pcsCase:72,boxPallet:6,orderBoxes:150,exwUnit:3229,cost_domesticLogistics:25000,cost_oceanFreight:41667,cost_insurance:1667,cost_brokerage:8333,competitor1:10000,price1:12000,map1:18000}),
+    newP({code:'DR10064',name:'(제품) 데일리솔루션 퍼펙트 연어 150g [15p]',category:'식품',status:'26/05/06이후 재고확보',currency:'YEN',shelfLife:25,pcsCase:72,boxPallet:6,orderBoxes:150,exwUnit:3433,cost_domesticLogistics:25000,cost_oceanFreight:41667,cost_insurance:1667,cost_brokerage:8333,competitor1:10000,price1:12000,map1:18000}),
+    newP({code:'DR10067',name:'(제품) 닥터펠리스 7+ 케어 스틱 치킨 150g [15p]',category:'식품',status:'재고보유, 출고요청일+D7',currency:'YEN',shelfLife:25,pcsCase:72,boxPallet:6,orderBoxes:150,exwUnit:3493,cost_domesticLogistics:25000,cost_oceanFreight:41667,cost_insurance:1667,cost_brokerage:8333,competitor1:10000,price1:12000,map1:18000}),
+    newP({code:'DR10068',name:'(제품) 닥터펠리스 7+ 케어 스틱 연어 150g [15p]',category:'식품',status:'재고보유, 출고요청일+D7',currency:'YEN',shelfLife:25,pcsCase:72,boxPallet:6,orderBoxes:150,exwUnit:3751,cost_domesticLogistics:25000,cost_oceanFreight:41667,cost_insurance:1667,cost_brokerage:8333,competitor1:10000,price1:12000,map1:18000}),
+  ];
+  save();renderSheet();renderSettings();showToast('샘플 7개 SKU 로드 완료');
+}
+
+// ========== INIT ==========
+load();renderSheet();renderSettings();
+</script>
+</body>
+</html>

@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해외사업 손익분석 대시보드 | Forcat · Felis · Dr.Felis</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #242836;
+  --border: #2e3345;
+  --text: #e4e6ef;
+  --text2: #9ca0b0;
+  --accent: #6c7cff;
+  --accent2: #4e5bdb;
+  --green: #34d399;
+  --red: #f87171;
+  --orange: #fbbf24;
+  --blue: #60a5fa;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+button { cursor:pointer; font-family:inherit; }
+input, select, textarea { font-family:inherit; }
+
+/* Header */
+.header { background:var(--surface); border-bottom:1px solid var(--border); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; }
+.header h1 { font-size:20px; font-weight:700; }
+.header h1 span { color:var(--accent); }
+.header-actions { display:flex; gap:8px; }
+.header-actions button { background:var(--surface2); border:1px solid var(--border); color:var(--text2); padding:8px 16px; border-radius:8px; font-size:13px; transition:all .2s; }
+.header-actions button:hover { border-color:var(--accent); color:var(--text); }
+
+/* Tabs */
+.tabs { display:flex; gap:4px; padding:12px 32px; background:var(--surface); border-bottom:1px solid var(--border); }
+.tab { padding:10px 20px; border-radius:8px; border:none; background:transparent; color:var(--text2); font-size:14px; font-weight:500; transition:all .2s; }
+.tab:hover { color:var(--text); background:var(--surface2); }
+.tab.active { background:var(--accent); color:#fff; }
+
+/* Main */
+.main { padding:24px 32px; max-width:1600px; margin:0 auto; }
+.section { display:none; }
+.section.active { display:block; }
+
+/* Cards */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:20px; }
+.card h2 { font-size:16px; font-weight:600; margin-bottom:16px; color:var(--text); }
+.card h3 { font-size:14px; font-weight:600; margin-bottom:12px; color:var(--text2); }
+
+/* KPI row */
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px; }
+.kpi { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; }
+.kpi-label { font-size:12px; color:var(--text2); margin-bottom:4px; text-transform:uppercase; letter-spacing:.5px; }
+.kpi-value { font-size:28px; font-weight:700; }
+.kpi-sub { font-size:12px; color:var(--text2); margin-top:4px; }
+.kpi-value.positive { color:var(--green); }
+.kpi-value.negative { color:var(--red); }
+
+/* Tables */
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; padding:10px 12px; color:var(--text2); font-weight:500; border-bottom:1px solid var(--border); white-space:nowrap; font-size:12px; }
+td { padding:10px 12px; border-bottom:1px solid var(--border); }
+tr:hover { background:var(--surface2); }
+.text-right { text-align:right; }
+.text-center { text-align:center; }
+
+/* Forms */
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:12px; color:var(--text2); font-weight:500; }
+.form-group input, .form-group select { background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:8px; font-size:14px; }
+.form-group input:focus, .form-group select:focus { outline:none; border-color:var(--accent); }
+.form-group .hint { font-size:11px; color:var(--text2); }
+
+.btn { padding:10px 20px; border-radius:8px; border:none; font-size:14px; font-weight:500; transition:all .2s; }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-primary:hover { background:var(--accent2); }
+.btn-danger { background:transparent; border:1px solid var(--red); color:var(--red); }
+.btn-danger:hover { background:var(--red); color:#fff; }
+.btn-secondary { background:var(--surface2); border:1px solid var(--border); color:var(--text2); }
+.btn-secondary:hover { border-color:var(--accent); color:var(--text); }
+.btn-sm { padding:6px 12px; font-size:12px; }
+
+.actions-bar { display:flex; gap:8px; margin-top:16px; }
+
+/* Simulation */
+.sim-row { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.sim-slider { margin-bottom:16px; }
+.sim-slider label { display:flex; justify-content:space-between; font-size:13px; color:var(--text2); margin-bottom:6px; }
+.sim-slider input[type=range] { width:100%; accent-color:var(--accent); }
+.sim-result { padding:16px; background:var(--surface2); border-radius:8px; margin-top:12px; }
+.sim-result-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
+.sim-result-row.total { font-weight:700; border-top:1px solid var(--border); padding-top:12px; margin-top:8px; }
+
+/* Chart container */
+.chart-container { position:relative; height:300px; margin-top:16px; }
+.chart-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; max-width:700px; width:95%; max-height:90vh; overflow-y:auto; }
+.modal h2 { margin-bottom:20px; }
+.modal .actions-bar { justify-content:flex-end; }
+
+/* Currency toggle */
+.currency-toggle { display:flex; align-items:center; gap:8px; font-size:13px; }
+.currency-toggle select { background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:4px 8px; border-radius:6px; }
+
+/* Scrollable table wrapper */
+.table-wrap { overflow-x:auto; }
+
+/* Badge */
+.badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
+.badge-green { background:rgba(52,211,153,.15); color:var(--green); }
+.badge-red { background:rgba(248,113,113,.15); color:var(--red); }
+.badge-orange { background:rgba(251,191,36,.15); color:var(--orange); }
+
+/* Settings area */
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+
+/* Toast */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--green); color:#000; padding:12px 20px; border-radius:8px; font-size:14px; font-weight:500; z-index:200; transform:translateY(80px); opacity:0; transition:all .3s; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* Responsive */
+@media (max-width:768px) {
+  .header { padding:12px 16px; }
+  .tabs { padding:8px 16px; overflow-x:auto; }
+  .main { padding:16px; }
+  .sim-row, .chart-row, .settings-grid { grid-template-columns:1fr; }
+  .kpi-row { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>PnL</span> 해외사업 손익분석</h1>
+  <div class="header-actions">
+    <div class="currency-toggle">
+      <label>환율 ₩/¥</label>
+      <input type="number" id="exchangeRate" value="9.2" step="0.1" style="width:70px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:13px;">
+    </div>
+    <button onclick="exportData()">JSON 내보내기</button>
+    <button onclick="document.getElementById('importFile').click()">JSON 가져오기</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="dashboard">대시보드</button>
+  <button class="tab" data-tab="skus">SKU 관리</button>
+  <button class="tab" data-tab="analysis">손익분석</button>
+  <button class="tab" data-tab="simulation">시뮬레이션</button>
+  <button class="tab" data-tab="data">Raw Data</button>
+  <button class="tab" data-tab="settings">설정</button>
+</div>
+
+<div class="main">
+  <!-- ===== DASHBOARD ===== -->
+  <div class="section active" id="sec-dashboard">
+    <div class="kpi-row" id="kpiRow"></div>
+    <div class="chart-row">
+      <div class="card">
+        <h2>SKU별 공헌이익률</h2>
+        <div class="chart-container"><canvas id="chartMargin"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>원가 구성 비율</h2>
+        <div class="chart-container"><canvas id="chartCost"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>SKU별 손익 요약</h2>
+      <div class="table-wrap">
+        <table id="dashTable">
+          <thead>
+            <tr>
+              <th>SKU</th><th>브랜드</th><th>카테고리</th>
+              <th class="text-right">판매가(¥)</th>
+              <th class="text-right">총원가(¥)</th>
+              <th class="text-right">공헌이익(¥)</th>
+              <th class="text-right">공헌이익률</th>
+              <th class="text-right">월 판매량</th>
+              <th class="text-right">월 이익(¥)</th>
+              <th>상태</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SKU MANAGEMENT ===== -->
+  <div class="section" id="sec-skus">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="margin:0;">SKU 목록</h2>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="loadSampleData()">샘플 데이터 불러오기</button>
+          <button class="btn btn-primary btn-sm" onclick="openSkuModal()">+ SKU 추가</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="skuTable">
+          <thead>
+            <tr>
+              <th>SKU 코드</th><th>상품명</th><th>브랜드</th><th>카테고리</th>
+              <th class="text-right">판매가(¥)</th>
+              <th class="text-right">총원가(¥)</th>
+              <th class="text-right">공헌이익률</th>
+              <th class="text-center">관리</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== P&L ANALYSIS ===== -->
+  <div class="section" id="sec-analysis">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="margin:0;">SKU별 상세 손익분석</h2>
+        <select id="analysisSkuSelect" onchange="renderAnalysis()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:14px;min-width:250px;"></select>
+      </div>
+      <div id="analysisContent"></div>
+    </div>
+  </div>
+
+  <!-- ===== SIMULATION ===== -->
+  <div class="section" id="sec-simulation">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="margin:0;">손익 시뮬레이션</h2>
+        <select id="simSkuSelect" onchange="renderSimulation()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:14px;min-width:250px;"></select>
+      </div>
+      <div class="sim-row">
+        <div>
+          <h3 style="color:var(--text2);margin-bottom:16px;">변수 조정</h3>
+          <div class="sim-slider">
+            <label><span>현지 판매가 (¥)</span><span id="simPriceVal">0</span></label>
+            <input type="range" id="simPrice" min="100" max="5000" step="10" oninput="updateSim()">
+          </div>
+          <div class="sim-slider">
+            <label><span>월 판매량 (개)</span><span id="simQtyVal">0</span></label>
+            <input type="range" id="simQty" min="0" max="10000" step="10" oninput="updateSim()">
+          </div>
+          <div class="sim-slider">
+            <label><span>환율 조정 (₩/¥)</span><span id="simFxVal">9.2</span></label>
+            <input type="range" id="simFx" min="5" max="15" step="0.1" oninput="updateSim()">
+          </div>
+          <div class="sim-slider">
+            <label><span>플랫폼 수수료율 (%)</span><span id="simCommVal">0</span></label>
+            <input type="range" id="simComm" min="0" max="30" step="0.5" oninput="updateSim()">
+          </div>
+          <div class="sim-slider">
+            <label><span>해상운임 변동 (%)</span><span id="simFreightVal">0</span></label>
+            <input type="range" id="simFreight" min="-50" max="100" step="5" oninput="updateSim()">
+          </div>
+        </div>
+        <div>
+          <h3 style="color:var(--text2);margin-bottom:16px;">시뮬레이션 결과</h3>
+          <div id="simResults"></div>
+          <div class="chart-container" style="height:250px;margin-top:20px;">
+            <canvas id="chartSim"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RAW DATA ===== -->
+  <div class="section" id="sec-data">
+    <div class="card">
+      <h2>Raw Data (전체 SKU)</h2>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:16px;">모든 SKU의 원가 데이터를 테이블 형태로 확인할 수 있습니다. CSV로 내보내기도 가능합니다.</p>
+      <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="margin-bottom:16px;">CSV 내보내기</button>
+      <div class="table-wrap">
+        <table id="rawTable">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="section" id="sec-settings">
+    <div class="settings-grid">
+      <div class="card">
+        <h2>원가 항목 관리</h2>
+        <p style="color:var(--text2);font-size:13px;margin-bottom:16px;">원가 항목을 추가/삭제할 수 있습니다. 기본 항목은 해외 수출 사업의 일반적인 원가 구조입니다.</p>
+        <div id="costItemsList"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input type="text" id="newCostItem" placeholder="새 원가 항목명" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;">
+          <select id="newCostType" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;">
+            <option value="fixed">고정(₩/개)</option>
+            <option value="rate">비율(%)</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="addCostItem()">추가</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>브랜드 & 카테고리</h2>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label>브랜드 목록 (쉼표 구분)</label>
+          <input type="text" id="brandList" value="Forcat,Felis,Dr.Felis" onchange="saveSettings()">
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label>카테고리 목록 (쉼표 구분)</label>
+          <input type="text" id="categoryList" value="동결건조 간식,기능성 트릿,츄르,고양이 모래,스크래쳐,기타" onchange="saveSettings()">
+        </div>
+        <h2 style="margin-top:24px;">데이터 관리</h2>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('모든 데이터가 삭제됩니다. 계속하시겠습니까?')){localStorage.clear();location.reload();}">전체 데이터 초기화</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SKU Modal -->
+<div class="modal-overlay" id="skuModal">
+  <div class="modal">
+    <h2 id="modalTitle">SKU 추가</h2>
+    <input type="hidden" id="editSkuId">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>SKU 코드</label>
+        <input type="text" id="skuCode" placeholder="예: FC-FD-001">
+      </div>
+      <div class="form-group">
+        <label>상품명</label>
+        <input type="text" id="skuName" placeholder="예: 동결건조 닭가슴살">
+      </div>
+      <div class="form-group">
+        <label>브랜드</label>
+        <select id="skuBrand"></select>
+      </div>
+      <div class="form-group">
+        <label>카테고리</label>
+        <select id="skuCategory"></select>
+      </div>
+      <div class="form-group">
+        <label>현지 판매가 (¥)</label>
+        <input type="number" id="skuPrice" placeholder="예: 980" step="1">
+      </div>
+      <div class="form-group">
+        <label>월 예상 판매량</label>
+        <input type="number" id="skuQty" placeholder="예: 500" step="1">
+      </div>
+    </div>
+    <h3 style="margin:20px 0 12px;color:var(--text2);">원가 항목 (단위: ₩/개 또는 %)</h3>
+    <div class="form-grid" id="costInputs"></div>
+    <div class="actions-bar">
+      <button class="btn btn-secondary" onclick="closeSkuModal()">취소</button>
+      <button class="btn btn-primary" onclick="saveSku()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== STATE ==========
+const DEFAULT_COST_ITEMS = [
+  { id:'rawMaterial', name:'원자재비', type:'fixed', desc:'원재료 원가 (₩/개)' },
+  { id:'subMaterial', name:'부자재비', type:'fixed', desc:'포장재, 라벨 등 (₩/개)' },
+  { id:'production', name:'생산가공비', type:'fixed', desc:'제조/가공 비용 (₩/개)' },
+  { id:'domesticLogistics', name:'국내물류비', type:'fixed', desc:'공장→항구 운송 (₩/개)' },
+  { id:'palletizing', name:'팔레타이징/혼적비', type:'fixed', desc:'팔레트 적재, 혼적 비용 (₩/개)' },
+  { id:'customs', name:'통관/검역비', type:'fixed', desc:'수출 통관, 검역 (₩/개)' },
+  { id:'oceanFreight', name:'해상운임', type:'fixed', desc:'FOB 이후 해상 운송 (₩/개)' },
+  { id:'localLogistics', name:'현지물류비', type:'fixed', desc:'현지 창고, 배송 (₩/개)' },
+  { id:'tariff', name:'관세', type:'rate', desc:'수입 관세율 (%)' },
+  { id:'platformComm', name:'플랫폼 수수료', type:'rate', desc:'EC 플랫폼 수수료 (%)' },
+  { id:'paymentFee', name:'결제수수료', type:'rate', desc:'PG/카드 수수료 (%)' },
+  { id:'marketing', name:'마케팅비', type:'fixed', desc:'개당 배분 마케팅 비용 (₩/개)' },
+  { id:'otherCost', name:'기타비용', type:'fixed', desc:'기타 비용 (₩/개)' },
+];
+
+let state = {
+  costItems: [...DEFAULT_COST_ITEMS],
+  skus: [],
+  settings: {
+    brands: ['Forcat','Felis','Dr.Felis'],
+    categories: ['동결건조 간식','기능성 트릿','츄르','고양이 모래','스크래쳐','기타'],
+    exchangeRate: 9.2,
+  }
+};
+
+// ========== PERSISTENCE ==========
+function save() {
+  state.settings.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 9.2;
+  localStorage.setItem('pnl_state', JSON.stringify(state));
+}
+function load() {
+  const s = localStorage.getItem('pnl_state');
+  if (s) {
+    const parsed = JSON.parse(s);
+    state = { ...state, ...parsed };
+    // ensure costItems have desc
+    state.costItems.forEach(ci => {
+      const def = DEFAULT_COST_ITEMS.find(d => d.id === ci.id);
+      if (def && !ci.desc) ci.desc = def.desc;
+    });
+  }
+  document.getElementById('exchangeRate').value = state.settings.exchangeRate;
+  document.getElementById('brandList').value = state.settings.brands.join(',');
+  document.getElementById('categoryList').value = state.settings.categories.join(',');
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `PnL_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('JSON 파일이 다운로드되었습니다');
+}
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      state = JSON.parse(ev.target.result);
+      save();
+      location.reload();
+    } catch(err) { alert('유효하지 않은 파일입니다.'); }
+  };
+  reader.readAsText(file);
+}
+function exportCSV() {
+  const fx = state.settings.exchangeRate;
+  const headers = ['SKU코드','상품명','브랜드','카테고리','판매가(¥)','월판매량'];
+  state.costItems.forEach(ci => headers.push(ci.name + (ci.type==='rate'?'(%)':'(₩)')));
+  headers.push('총원가(₩)','총원가(¥)','공헌이익(¥)','공헌이익률(%)');
+
+  const rows = state.skus.map(sku => {
+    const calc = calcSku(sku);
+    const row = [sku.code, sku.name, sku.brand, sku.category, sku.priceJpy, sku.monthlyQty];
+    state.costItems.forEach(ci => row.push(sku.costs[ci.id] || 0));
+    row.push(Math.round(calc.totalCostKrw), Math.round(calc.totalCostJpy), Math.round(calc.contributionJpy), calc.contributionRate.toFixed(1));
+    return row;
+  });
+
+  let csv = '\uFEFF' + headers.join(',') + '\n';
+  rows.forEach(r => csv += r.join(',') + '\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `PnL_data_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('CSV 파일이 다운로드되었습니다');
+}
+
+// ========== CALCULATION ==========
+function calcSku(sku, overrides = {}) {
+  const fx = overrides.fx || state.settings.exchangeRate;
+  const priceJpy = overrides.priceJpy || sku.priceJpy;
+  const priceKrw = priceJpy * fx;
+
+  // Fixed costs in KRW
+  let fixedCostKrw = 0;
+  state.costItems.filter(ci => ci.type === 'fixed').forEach(ci => {
+    fixedCostKrw += parseFloat(sku.costs[ci.id] || 0);
+  });
+
+  // Rate costs applied to selling price in KRW
+  let rateCostKrw = 0;
+  state.costItems.filter(ci => ci.type === 'rate').forEach(ci => {
+    const overrideKey = 'rate_' + ci.id;
+    const rate = overrides[overrideKey] !== undefined ? overrides[overrideKey] : parseFloat(sku.costs[ci.id] || 0);
+    rateCostKrw += priceKrw * (rate / 100);
+  });
+
+  // Freight override
+  if (overrides.freightChange !== undefined) {
+    const freightIdx = state.costItems.findIndex(ci => ci.id === 'oceanFreight');
+    if (freightIdx >= 0) {
+      const origFreight = parseFloat(sku.costs['oceanFreight'] || 0);
+      const delta = origFreight * (overrides.freightChange / 100);
+      fixedCostKrw += delta; // add the delta on top (original already included)
+    }
+  }
+
+  const totalCostKrw = fixedCostKrw + rateCostKrw;
+  const totalCostJpy = totalCostKrw / fx;
+  const contributionJpy = priceJpy - totalCostJpy;
+  const contributionRate = priceJpy > 0 ? (contributionJpy / priceJpy) * 100 : 0;
+
+  const qty = overrides.qty || sku.monthlyQty || 0;
+  const monthlyRevenueJpy = priceJpy * qty;
+  const monthlyCostJpy = totalCostJpy * qty;
+  const monthlyProfitJpy = contributionJpy * qty;
+
+  return {
+    priceJpy, priceKrw, fixedCostKrw, rateCostKrw,
+    totalCostKrw, totalCostJpy, contributionJpy, contributionRate,
+    monthlyRevenueJpy, monthlyCostJpy, monthlyProfitJpy, qty
+  };
+}
+
+// ========== TABS ==========
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('sec-' + tab.dataset.tab).classList.add('active');
+    renderAll();
+  });
+});
+
+// ========== TOAST ==========
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ========== SKU MODAL ==========
+function openSkuModal(skuId) {
+  const modal = document.getElementById('skuModal');
+  modal.classList.add('open');
+
+  // Populate brand/category selects
+  const brandSel = document.getElementById('skuBrand');
+  const catSel = document.getElementById('skuCategory');
+  brandSel.innerHTML = state.settings.brands.map(b => `<option>${b}</option>`).join('');
+  catSel.innerHTML = state.settings.categories.map(c => `<option>${c}</option>`).join('');
+
+  // Populate cost inputs
+  const costDiv = document.getElementById('costInputs');
+  costDiv.innerHTML = state.costItems.map(ci => `
+    <div class="form-group">
+      <label>${ci.name} ${ci.type==='rate'?'(%)':'(₩/개)'}</label>
+      <input type="number" id="cost_${ci.id}" step="any" placeholder="0" value="0">
+      <span class="hint">${ci.desc || ''}</span>
+    </div>
+  `).join('');
+
+  if (skuId) {
+    const sku = state.skus.find(s => s.id === skuId);
+    if (sku) {
+      document.getElementById('modalTitle').textContent = 'SKU 수정';
+      document.getElementById('editSkuId').value = sku.id;
+      document.getElementById('skuCode').value = sku.code;
+      document.getElementById('skuName').value = sku.name;
+      document.getElementById('skuBrand').value = sku.brand;
+      document.getElementById('skuCategory').value = sku.category;
+      document.getElementById('skuPrice').value = sku.priceJpy;
+      document.getElementById('skuQty').value = sku.monthlyQty;
+      state.costItems.forEach(ci => {
+        const el = document.getElementById('cost_' + ci.id);
+        if (el) el.value = sku.costs[ci.id] || 0;
+      });
+    }
+  } else {
+    document.getElementById('modalTitle').textContent = 'SKU 추가';
+    document.getElementById('editSkuId').value = '';
+    document.getElementById('skuCode').value = '';
+    document.getElementById('skuName').value = '';
+    document.getElementById('skuPrice').value = '';
+    document.getElementById('skuQty').value = '';
+  }
+}
+function closeSkuModal() {
+  document.getElementById('skuModal').classList.remove('open');
+}
+function saveSku() {
+  const id = document.getElementById('editSkuId').value || 'sku_' + Date.now();
+  const costs = {};
+  state.costItems.forEach(ci => {
+    costs[ci.id] = parseFloat(document.getElementById('cost_' + ci.id)?.value || 0);
+  });
+
+  const skuData = {
+    id,
+    code: document.getElementById('skuCode').value.trim(),
+    name: document.getElementById('skuName').value.trim(),
+    brand: document.getElementById('skuBrand').value,
+    category: document.getElementById('skuCategory').value,
+    priceJpy: parseFloat(document.getElementById('skuPrice').value) || 0,
+    monthlyQty: parseInt(document.getElementById('skuQty').value) || 0,
+    costs,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (!skuData.code || !skuData.name) {
+    alert('SKU 코드와 상품명은 필수입니다.');
+    return;
+  }
+
+  const idx = state.skus.findIndex(s => s.id === id);
+  if (idx >= 0) state.skus[idx] = skuData;
+  else state.skus.push(skuData);
+
+  save();
+  closeSkuModal();
+  renderAll();
+  showToast('SKU가 저장되었습니다');
+}
+function deleteSku(id) {
+  if (!confirm('이 SKU를 삭제하시겠습니까?')) return;
+  state.skus = state.skus.filter(s => s.id !== id);
+  save();
+  renderAll();
+  showToast('SKU가 삭제되었습니다');
+}
+function duplicateSku(id) {
+  const src = state.skus.find(s => s.id === id);
+  if (!src) return;
+  const dup = JSON.parse(JSON.stringify(src));
+  dup.id = 'sku_' + Date.now();
+  dup.code = src.code + '_copy';
+  dup.name = src.name + ' (복사)';
+  state.skus.push(dup);
+  save();
+  renderAll();
+  showToast('SKU가 복사되었습니다');
+}
+
+// ========== SETTINGS ==========
+function saveSettings() {
+  state.settings.brands = document.getElementById('brandList').value.split(',').map(s=>s.trim()).filter(Boolean);
+  state.settings.categories = document.getElementById('categoryList').value.split(',').map(s=>s.trim()).filter(Boolean);
+  save();
+  showToast('설정이 저장되었습니다');
+}
+function renderCostItems() {
+  const div = document.getElementById('costItemsList');
+  div.innerHTML = state.costItems.map(ci => `
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
+      <span style="flex:1;font-size:13px;">${ci.name}</span>
+      <span class="badge ${ci.type==='rate'?'badge-orange':'badge-green'}">${ci.type==='rate'?'비율(%)':'고정(₩)'}</span>
+      <button class="btn btn-danger btn-sm" onclick="removeCostItem('${ci.id}')" style="padding:4px 8px;font-size:11px;">삭제</button>
+    </div>
+  `).join('');
+}
+function addCostItem() {
+  const name = document.getElementById('newCostItem').value.trim();
+  const type = document.getElementById('newCostType').value;
+  if (!name) return;
+  const id = 'custom_' + Date.now();
+  state.costItems.push({ id, name, type, desc: '' });
+  document.getElementById('newCostItem').value = '';
+  save();
+  renderCostItems();
+  showToast('원가 항목이 추가되었습니다');
+}
+function removeCostItem(id) {
+  if (!confirm('이 원가 항목을 삭제하시겠습니까?')) return;
+  state.costItems = state.costItems.filter(ci => ci.id !== id);
+  save();
+  renderCostItems();
+}
+
+// ========== RENDER FUNCTIONS ==========
+let chartMargin, chartCost, chartSim;
+
+function fmt(n) { return n.toLocaleString('ko-KR', {maximumFractionDigits:0}); }
+function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+function renderDashboard() {
+  const fx = state.settings.exchangeRate;
+  let totalRevenue = 0, totalCost = 0, totalProfit = 0, totalQty = 0;
+  const skuCalcs = state.skus.map(sku => {
+    const c = calcSku(sku);
+    totalRevenue += c.monthlyRevenueJpy;
+    totalCost += c.monthlyCostJpy;
+    totalProfit += c.monthlyProfitJpy;
+    totalQty += c.qty;
+    return { sku, calc: c };
+  });
+  const avgMargin = totalRevenue > 0 ? ((totalRevenue - totalCost) / totalRevenue * 100) : 0;
+
+  // KPIs
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">전체 SKU</div>
+      <div class="kpi-value">${state.skus.length}</div>
+      <div class="kpi-sub">등록된 상품</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">월 총 매출</div>
+      <div class="kpi-value">¥${fmt(totalRevenue)}</div>
+      <div class="kpi-sub">₩${fmt(totalRevenue * fx)}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">월 총 이익</div>
+      <div class="kpi-value ${totalProfit>=0?'positive':'negative'}">¥${fmt(totalProfit)}</div>
+      <div class="kpi-sub">₩${fmt(totalProfit * fx)}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">평균 공헌이익률</div>
+      <div class="kpi-value ${avgMargin>=20?'positive':avgMargin>=0?'':'negative'}">${fmtPct(avgMargin)}</div>
+      <div class="kpi-sub">${avgMargin>=30?'양호':avgMargin>=15?'보통':'주의'}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">월 총 판매량</div>
+      <div class="kpi-value">${fmt(totalQty)}</div>
+      <div class="kpi-sub">전체 SKU 합계</div>
+    </div>
+  `;
+
+  // Dashboard table
+  const tbody = document.querySelector('#dashTable tbody');
+  tbody.innerHTML = skuCalcs.map(({sku, calc}) => {
+    const badge = calc.contributionRate >= 30 ? 'badge-green' :
+                  calc.contributionRate >= 10 ? 'badge-orange' : 'badge-red';
+    const status = calc.contributionRate >= 30 ? '양호' :
+                   calc.contributionRate >= 10 ? '보통' : '주의';
+    return `<tr>
+      <td>${sku.code}</td>
+      <td>${sku.brand}</td>
+      <td>${sku.category}</td>
+      <td class="text-right">¥${fmt(calc.priceJpy)}</td>
+      <td class="text-right">¥${fmt(calc.totalCostJpy)}</td>
+      <td class="text-right" style="color:${calc.contributionJpy>=0?'var(--green)':'var(--red)'}">¥${fmt(calc.contributionJpy)}</td>
+      <td class="text-right"><span class="badge ${badge}">${fmtPct(calc.contributionRate)}</span></td>
+      <td class="text-right">${fmt(sku.monthlyQty)}</td>
+      <td class="text-right" style="color:${calc.monthlyProfitJpy>=0?'var(--green)':'var(--red)'}">¥${fmt(calc.monthlyProfitJpy)}</td>
+      <td><span class="badge ${badge}">${status}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Charts
+  if (chartMargin) chartMargin.destroy();
+  if (chartCost) chartCost.destroy();
+
+  if (skuCalcs.length > 0) {
+    const ctx1 = document.getElementById('chartMargin').getContext('2d');
+    chartMargin = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: skuCalcs.map(s => s.sku.code),
+        datasets: [{
+          label: '공헌이익률 (%)',
+          data: skuCalcs.map(s => s.calc.contributionRate),
+          backgroundColor: skuCalcs.map(s => s.calc.contributionRate >= 30 ? '#34d399' : s.calc.contributionRate >= 10 ? '#fbbf24' : '#f87171'),
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { color: '#9ca0b0', callback: v => v + '%' }, grid: { color: '#2e3345' } },
+          x: { ticks: { color: '#9ca0b0', maxRotation: 45 }, grid: { display: false } }
+        }
+      }
+    });
+
+    // Aggregate cost breakdown
+    const costTotals = {};
+    state.costItems.forEach(ci => costTotals[ci.name] = 0);
+    skuCalcs.forEach(({sku, calc}) => {
+      state.costItems.forEach(ci => {
+        if (ci.type === 'fixed') {
+          costTotals[ci.name] += (parseFloat(sku.costs[ci.id] || 0) * calc.qty);
+        } else {
+          costTotals[ci.name] += (calc.priceKrw * (parseFloat(sku.costs[ci.id] || 0) / 100) * calc.qty);
+        }
+      });
+    });
+
+    const costLabels = Object.keys(costTotals).filter(k => costTotals[k] > 0);
+    const costValues = costLabels.map(k => costTotals[k]);
+    const colors = ['#6c7cff','#34d399','#f87171','#fbbf24','#60a5fa','#a78bfa','#fb923c','#f472b6','#2dd4bf','#e879f9','#84cc16','#f43f5e','#22d3ee'];
+
+    const ctx2 = document.getElementById('chartCost').getContext('2d');
+    chartCost = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: costLabels,
+        datasets: [{ data: costValues, backgroundColor: colors.slice(0, costLabels.length), borderWidth: 0 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { color: '#9ca0b0', font: { size: 11 }, padding: 8 } }
+        }
+      }
+    });
+  }
+}
+
+function renderSkuTable() {
+  const tbody = document.querySelector('#skuTable tbody');
+  tbody.innerHTML = state.skus.map(sku => {
+    const c = calcSku(sku);
+    const badge = c.contributionRate >= 30 ? 'badge-green' : c.contributionRate >= 10 ? 'badge-orange' : 'badge-red';
+    return `<tr>
+      <td>${sku.code}</td>
+      <td>${sku.name}</td>
+      <td>${sku.brand}</td>
+      <td>${sku.category}</td>
+      <td class="text-right">¥${fmt(sku.priceJpy)}</td>
+      <td class="text-right">¥${fmt(c.totalCostJpy)}</td>
+      <td class="text-right"><span class="badge ${badge}">${fmtPct(c.contributionRate)}</span></td>
+      <td class="text-center">
+        <button class="btn btn-secondary btn-sm" onclick="openSkuModal('${sku.id}')" style="margin-right:4px;">수정</button>
+        <button class="btn btn-secondary btn-sm" onclick="duplicateSku('${sku.id}')" style="margin-right:4px;">복사</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteSku('${sku.id}')">삭제</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  if (state.skus.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:40px;color:var(--text2);">등록된 SKU가 없습니다. "SKU 추가" 또는 "샘플 데이터 불러오기"를 클릭하세요.</td></tr>';
+  }
+}
+
+function renderAnalysis() {
+  const sel = document.getElementById('analysisSkuSelect');
+  if (sel.options.length === 0) {
+    sel.innerHTML = state.skus.map(s => `<option value="${s.id}">${s.code} - ${s.name}</option>`).join('');
+  }
+  const sku = state.skus.find(s => s.id === sel.value);
+  if (!sku) {
+    document.getElementById('analysisContent').innerHTML = '<p style="color:var(--text2);padding:20px;">SKU를 선택하세요.</p>';
+    return;
+  }
+  const c = calcSku(sku);
+  const fx = state.settings.exchangeRate;
+
+  let rows = '';
+  let subtotalFixed = 0;
+  state.costItems.filter(ci => ci.type === 'fixed').forEach(ci => {
+    const val = parseFloat(sku.costs[ci.id] || 0);
+    subtotalFixed += val;
+    const pct = c.priceKrw > 0 ? (val / c.priceKrw * 100) : 0;
+    rows += `<tr>
+      <td style="padding-left:24px;">${ci.name}</td>
+      <td class="text-right">₩${fmt(val)}</td>
+      <td class="text-right">¥${fmt(val / fx)}</td>
+      <td class="text-right">${fmtPct(pct)}</td>
+    </tr>`;
+  });
+
+  rows += `<tr style="background:var(--surface2);font-weight:600;">
+    <td>고정비 소계</td>
+    <td class="text-right">₩${fmt(subtotalFixed)}</td>
+    <td class="text-right">¥${fmt(subtotalFixed / fx)}</td>
+    <td class="text-right">${fmtPct(c.priceKrw > 0 ? subtotalFixed / c.priceKrw * 100 : 0)}</td>
+  </tr>`;
+
+  let subtotalRate = 0;
+  state.costItems.filter(ci => ci.type === 'rate').forEach(ci => {
+    const rate = parseFloat(sku.costs[ci.id] || 0);
+    const val = c.priceKrw * (rate / 100);
+    subtotalRate += val;
+    rows += `<tr>
+      <td style="padding-left:24px;">${ci.name} (${rate}%)</td>
+      <td class="text-right">₩${fmt(val)}</td>
+      <td class="text-right">¥${fmt(val / fx)}</td>
+      <td class="text-right">${fmtPct(c.priceKrw > 0 ? val / c.priceKrw * 100 : 0)}</td>
+    </tr>`;
+  });
+
+  rows += `<tr style="background:var(--surface2);font-weight:600;">
+    <td>변동비 소계</td>
+    <td class="text-right">₩${fmt(subtotalRate)}</td>
+    <td class="text-right">¥${fmt(subtotalRate / fx)}</td>
+    <td class="text-right">${fmtPct(c.priceKrw > 0 ? subtotalRate / c.priceKrw * 100 : 0)}</td>
+  </tr>`;
+
+  document.getElementById('analysisContent').innerHTML = `
+    <div class="kpi-row" style="margin-bottom:20px;">
+      <div class="kpi"><div class="kpi-label">판매가</div><div class="kpi-value">¥${fmt(c.priceJpy)}</div><div class="kpi-sub">₩${fmt(c.priceKrw)}</div></div>
+      <div class="kpi"><div class="kpi-label">총원가</div><div class="kpi-value">¥${fmt(c.totalCostJpy)}</div><div class="kpi-sub">₩${fmt(c.totalCostKrw)}</div></div>
+      <div class="kpi"><div class="kpi-label">공헌이익</div><div class="kpi-value ${c.contributionJpy>=0?'positive':'negative'}">¥${fmt(c.contributionJpy)}</div><div class="kpi-sub">₩${fmt(c.contributionJpy*fx)}</div></div>
+      <div class="kpi"><div class="kpi-label">공헌이익률</div><div class="kpi-value ${c.contributionRate>=20?'positive':'negative'}">${fmtPct(c.contributionRate)}</div></div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>항목</th><th class="text-right">₩/개</th><th class="text-right">¥/개</th><th class="text-right">매출 대비</th></tr>
+      </thead>
+      <tbody>
+        <tr style="font-weight:600;"><td>매출 (판매가)</td><td class="text-right">₩${fmt(c.priceKrw)}</td><td class="text-right">¥${fmt(c.priceJpy)}</td><td class="text-right">100%</td></tr>
+        ${rows}
+        <tr style="font-weight:700;border-top:2px solid var(--accent);">
+          <td>총원가</td>
+          <td class="text-right">₩${fmt(c.totalCostKrw)}</td>
+          <td class="text-right">¥${fmt(c.totalCostJpy)}</td>
+          <td class="text-right">${fmtPct(c.priceKrw > 0 ? c.totalCostKrw / c.priceKrw * 100 : 0)}</td>
+        </tr>
+        <tr style="font-weight:700;color:${c.contributionJpy>=0?'var(--green)':'var(--red)'};">
+          <td>공헌이익</td>
+          <td class="text-right">₩${fmt(c.contributionJpy * fx)}</td>
+          <td class="text-right">¥${fmt(c.contributionJpy)}</td>
+          <td class="text-right">${fmtPct(c.contributionRate)}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:20px;padding:16px;background:var(--surface2);border-radius:8px;">
+      <h3 style="margin-bottom:8px;">월간 예상 (판매량: ${fmt(sku.monthlyQty)}개)</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div><div style="font-size:12px;color:var(--text2);">월 매출</div><div style="font-size:18px;font-weight:600;">¥${fmt(c.monthlyRevenueJpy)}</div></div>
+        <div><div style="font-size:12px;color:var(--text2);">월 원가</div><div style="font-size:18px;font-weight:600;">¥${fmt(c.monthlyCostJpy)}</div></div>
+        <div><div style="font-size:12px;color:var(--text2);">월 이익</div><div style="font-size:18px;font-weight:600;color:${c.monthlyProfitJpy>=0?'var(--green)':'var(--red)'}">¥${fmt(c.monthlyProfitJpy)}</div></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSimulation() {
+  const sel = document.getElementById('simSkuSelect');
+  if (sel.options.length === 0) {
+    sel.innerHTML = state.skus.map(s => `<option value="${s.id}">${s.code} - ${s.name}</option>`).join('');
+  }
+  const sku = state.skus.find(s => s.id === sel.value);
+  if (!sku) return;
+
+  document.getElementById('simPrice').value = sku.priceJpy;
+  document.getElementById('simPrice').max = Math.max(sku.priceJpy * 3, 5000);
+  document.getElementById('simQty').value = sku.monthlyQty;
+  document.getElementById('simFx').value = state.settings.exchangeRate;
+  const platformRate = sku.costs['platformComm'] || 0;
+  document.getElementById('simComm').value = platformRate;
+  document.getElementById('simFreight').value = 0;
+  updateSim();
+}
+
+function updateSim() {
+  const sel = document.getElementById('simSkuSelect');
+  const sku = state.skus.find(s => s.id === sel.value);
+  if (!sku) return;
+
+  const priceJpy = parseFloat(document.getElementById('simPrice').value);
+  const qty = parseInt(document.getElementById('simQty').value);
+  const fx = parseFloat(document.getElementById('simFx').value);
+  const comm = parseFloat(document.getElementById('simComm').value);
+  const freightChange = parseFloat(document.getElementById('simFreight').value);
+
+  document.getElementById('simPriceVal').textContent = '¥' + fmt(priceJpy);
+  document.getElementById('simQtyVal').textContent = fmt(qty);
+  document.getElementById('simFxVal').textContent = fx.toFixed(1);
+  document.getElementById('simCommVal').textContent = comm.toFixed(1) + '%';
+  document.getElementById('simFreightVal').textContent = (freightChange >= 0 ? '+' : '') + freightChange + '%';
+
+  const original = calcSku(sku);
+  const simulated = calcSku(sku, {
+    priceJpy, qty, fx,
+    rate_platformComm: comm,
+    freightChange
+  });
+
+  const profitDelta = simulated.monthlyProfitJpy - original.monthlyProfitJpy;
+
+  document.getElementById('simResults').innerHTML = `
+    <div class="sim-result">
+      <div class="sim-result-row"><span>판매가</span><span>¥${fmt(original.priceJpy)} → ¥${fmt(simulated.priceJpy)}</span></div>
+      <div class="sim-result-row"><span>총원가/개</span><span>¥${fmt(original.totalCostJpy)} → ¥${fmt(simulated.totalCostJpy)}</span></div>
+      <div class="sim-result-row"><span>공헌이익/개</span><span style="color:${simulated.contributionJpy>=0?'var(--green)':'var(--red)'}">¥${fmt(original.contributionJpy)} → ¥${fmt(simulated.contributionJpy)}</span></div>
+      <div class="sim-result-row"><span>공헌이익률</span><span style="color:${simulated.contributionRate>=20?'var(--green)':'var(--red)'}">${fmtPct(original.contributionRate)} → ${fmtPct(simulated.contributionRate)}</span></div>
+      <div class="sim-result-row total"><span>월 매출</span><span>¥${fmt(simulated.monthlyRevenueJpy)}</span></div>
+      <div class="sim-result-row"><span>월 원가</span><span>¥${fmt(simulated.monthlyCostJpy)}</span></div>
+      <div class="sim-result-row"><span>월 이익</span><span style="color:${simulated.monthlyProfitJpy>=0?'var(--green)':'var(--red)'}">¥${fmt(simulated.monthlyProfitJpy)}</span></div>
+      <div class="sim-result-row"><span>이익 변화</span><span style="color:${profitDelta>=0?'var(--green)':'var(--red)'}">${profitDelta>=0?'+':''}¥${fmt(profitDelta)}</span></div>
+    </div>
+  `;
+
+  // Chart
+  if (chartSim) chartSim.destroy();
+  const ctx = document.getElementById('chartSim').getContext('2d');
+  chartSim = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['현재', '시뮬레이션'],
+      datasets: [
+        { label: '매출', data: [original.monthlyRevenueJpy, simulated.monthlyRevenueJpy], backgroundColor: '#60a5fa', borderRadius: 4 },
+        { label: '원가', data: [original.monthlyCostJpy, simulated.monthlyCostJpy], backgroundColor: '#f87171', borderRadius: 4 },
+        { label: '이익', data: [original.monthlyProfitJpy, simulated.monthlyProfitJpy], backgroundColor: '#34d399', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#9ca0b0' } } },
+      scales: {
+        y: { ticks: { color: '#9ca0b0', callback: v => '¥' + (v/1000).toFixed(0) + 'K' }, grid: { color: '#2e3345' } },
+        x: { ticks: { color: '#9ca0b0' }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderRawData() {
+  const fx = state.settings.exchangeRate;
+  const thead = document.querySelector('#rawTable thead');
+  const tbody = document.querySelector('#rawTable tbody');
+
+  let headerHTML = '<tr><th>SKU</th><th>상품명</th><th>브랜드</th><th>판매가(¥)</th><th>월판매량</th>';
+  state.costItems.forEach(ci => headerHTML += `<th class="text-right">${ci.name}</th>`);
+  headerHTML += '<th class="text-right">총원가(₩)</th><th class="text-right">총원가(¥)</th><th class="text-right">공헌이익(¥)</th><th class="text-right">이익률</th></tr>';
+  thead.innerHTML = headerHTML;
+
+  tbody.innerHTML = state.skus.map(sku => {
+    const c = calcSku(sku);
+    let row = `<td>${sku.code}</td><td>${sku.name}</td><td>${sku.brand}</td><td class="text-right">¥${fmt(sku.priceJpy)}</td><td class="text-right">${fmt(sku.monthlyQty)}</td>`;
+    state.costItems.forEach(ci => {
+      const val = sku.costs[ci.id] || 0;
+      row += `<td class="text-right">${ci.type==='rate'? val+'%' : '₩'+fmt(val)}</td>`;
+    });
+    row += `<td class="text-right">₩${fmt(c.totalCostKrw)}</td>`;
+    row += `<td class="text-right">¥${fmt(c.totalCostJpy)}</td>`;
+    row += `<td class="text-right" style="color:${c.contributionJpy>=0?'var(--green)':'var(--red)'}">¥${fmt(c.contributionJpy)}</td>`;
+    row += `<td class="text-right">${fmtPct(c.contributionRate)}</td>`;
+    return `<tr>${row}</tr>`;
+  }).join('');
+}
+
+function populateSelects() {
+  const a = document.getElementById('analysisSkuSelect');
+  const s = document.getElementById('simSkuSelect');
+  const aVal = a.value;
+  const sVal = s.value;
+  const opts = state.skus.map(sk => `<option value="${sk.id}">${sk.code} - ${sk.name}</option>`).join('');
+  a.innerHTML = opts;
+  s.innerHTML = opts;
+  if (aVal && state.skus.find(sk=>sk.id===aVal)) a.value = aVal;
+  if (sVal && state.skus.find(sk=>sk.id===sVal)) s.value = sVal;
+}
+
+function renderAll() {
+  populateSelects();
+  renderDashboard();
+  renderSkuTable();
+  renderAnalysis();
+  renderSimulation();
+  renderRawData();
+  renderCostItems();
+}
+
+// ========== SAMPLE DATA ==========
+function loadSampleData() {
+  if (state.skus.length > 0 && !confirm('기존 데이터가 있습니다. 샘플 데이터로 대체하시겠습니까?')) return;
+
+  const samples = [
+    { code:'FC-FD-001', name:'동결건조 닭가슴살 30g', brand:'Forcat', category:'동결건조 간식', priceJpy:880, monthlyQty:800, costs:{rawMaterial:1200,subMaterial:350,production:400,domesticLogistics:100,palletizing:80,customs:50,oceanFreight:200,localLogistics:150,tariff:3,platformComm:15,paymentFee:3.5,marketing:200,otherCost:50}},
+    { code:'FC-FD-002', name:'동결건조 연어 30g', brand:'Forcat', category:'동결건조 간식', priceJpy:980, monthlyQty:600, costs:{rawMaterial:1500,subMaterial:350,production:420,domesticLogistics:100,palletizing:80,customs:50,oceanFreight:200,localLogistics:150,tariff:3,platformComm:15,paymentFee:3.5,marketing:200,otherCost:50}},
+    { code:'FC-FD-003', name:'동결건조 참치 30g', brand:'Forcat', category:'동결건조 간식', priceJpy:980, monthlyQty:700, costs:{rawMaterial:1400,subMaterial:350,production:420,domesticLogistics:100,palletizing:80,customs:50,oceanFreight:200,localLogistics:150,tariff:3,platformComm:15,paymentFee:3.5,marketing:200,otherCost:50}},
+    { code:'FC-FD-004', name:'동결건조 오리 30g', brand:'Forcat', category:'동결건조 간식', priceJpy:950, monthlyQty:400, costs:{rawMaterial:1350,subMaterial:350,production:400,domesticLogistics:100,palletizing:80,customs:50,oceanFreight:200,localLogistics:150,tariff:3,platformComm:15,paymentFee:3.5,marketing:200,otherCost:50}},
+    { code:'FC-FD-005', name:'동결건조 새우 25g', brand:'Forcat', category:'동결건조 간식', priceJpy:1080, monthlyQty:350, costs:{rawMaterial:1800,subMaterial:350,production:450,domesticLogistics:100,palletizing:80,customs:50,oceanFreight:200,localLogistics:150,tariff:3,platformComm:15,paymentFee:3.5,marketing:250,otherCost:50}},
+    { code:'FL-TR-001', name:'유산균 트릿 60g', brand:'Felis', category:'기능성 트릿', priceJpy:1280, monthlyQty:500, costs:{rawMaterial:1800,subMaterial:500,production:600,domesticLogistics:120,palletizing:80,customs:60,oceanFreight:220,localLogistics:160,tariff:3,platformComm:15,paymentFee:3.5,marketing:300,otherCost:80}},
+    { code:'FL-TR-002', name:'타우린 트릿 60g', brand:'Felis', category:'기능성 트릿', priceJpy:1280, monthlyQty:450, costs:{rawMaterial:1900,subMaterial:500,production:600,domesticLogistics:120,palletizing:80,customs:60,oceanFreight:220,localLogistics:160,tariff:3,platformComm:15,paymentFee:3.5,marketing:300,otherCost:80}},
+    { code:'FL-TR-003', name:'헤어볼 트릿 60g', brand:'Felis', category:'기능성 트릿', priceJpy:1180, monthlyQty:400, costs:{rawMaterial:1700,subMaterial:500,production:580,domesticLogistics:120,palletizing:80,customs:60,oceanFreight:220,localLogistics:160,tariff:3,platformComm:15,paymentFee:3.5,marketing:280,otherCost:80}},
+    { code:'DF-CH-001', name:'닭가슴살 츄르 4p', brand:'Dr.Felis', category:'츄르', priceJpy:580, monthlyQty:1200, costs:{rawMaterial:800,subMaterial:300,production:250,domesticLogistics:80,palletizing:60,customs:40,oceanFreight:150,localLogistics:120,tariff:3,platformComm:15,paymentFee:3.5,marketing:150,otherCost:30}},
+    { code:'DF-CH-002', name:'참치 츄르 4p', brand:'Dr.Felis', category:'츄르', priceJpy:580, monthlyQty:1000, costs:{rawMaterial:850,subMaterial:300,production:250,domesticLogistics:80,palletizing:60,customs:40,oceanFreight:150,localLogistics:120,tariff:3,platformComm:15,paymentFee:3.5,marketing:150,otherCost:30}},
+    { code:'DF-CH-003', name:'연어 츄르 4p', brand:'Dr.Felis', category:'츄르', priceJpy:620, monthlyQty:900, costs:{rawMaterial:900,subMaterial:300,production:260,domesticLogistics:80,palletizing:60,customs:40,oceanFreight:150,localLogistics:120,tariff:3,platformComm:15,paymentFee:3.5,marketing:150,otherCost:30}},
+    { code:'FC-FD-006', name:'동결건조 닭간 25g', brand:'Forcat', category:'동결건조 간식', priceJpy:850, monthlyQty:300, costs:{rawMaterial:1100,subMaterial:350,production:380,domesticLogistics:100,palletizing:80,customs:50,oceanFreight:200,localLogistics:150,tariff:3,platformComm:15,paymentFee:3.5,marketing:180,otherCost:50}},
+  ];
+
+  state.skus = samples.map((s, i) => ({
+    ...s,
+    id: 'sku_sample_' + i,
+    updatedAt: new Date().toISOString()
+  }));
+  save();
+  renderAll();
+  showToast('샘플 데이터 12개 SKU가 불러와졌습니다');
+}
+
+// ========== EXCHANGE RATE LISTENER ==========
+document.getElementById('exchangeRate').addEventListener('change', () => {
+  save();
+  renderAll();
+});
+
+// ========== INIT ==========
+load();
+renderAll();
+</script>
+</body>
+</html>

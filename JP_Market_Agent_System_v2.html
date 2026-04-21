@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Japan Market Intelligence Agent | Dr.Felis</title>
+<style>
+:root{--bg:#0c0e14;--s:#141620;--s2:#1c1f2e;--s3:#252840;--bd:#2a2e42;--t:#e2e4ef;--t2:#8b90a8;--t3:#5a5f78;
+--ac:#6c7cff;--ac2:#4e5bdb;--g:#34d399;--r:#f87171;--o:#fbbf24;--bl:#60a5fa;--pu:#a78bfa;--cy:#22d3ee;--pk:#f472b6;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Pretendard',sans-serif;background:var(--bg);color:var(--t);font-size:12px;line-height:1.55;}
+button{cursor:pointer;font-family:inherit;font-size:11px;}
+input,select,textarea{font-family:inherit;font-size:11px;background:var(--s2);border:1px solid var(--bd);color:var(--t);border-radius:4px;padding:4px 6px;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--ac);}
+a{color:var(--bl);text-decoration:none;}a:hover{text-decoration:underline;}
+
+/* Header */
+.hd{background:var(--s);border-bottom:1px solid var(--bd);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.hd h1{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}.hd h1 span{color:var(--ac);}
+.hd-r{display:flex;gap:5px;align-items:center;}
+.hb{background:var(--s2);border:1px solid var(--bd);color:var(--t2);padding:5px 10px;border-radius:5px;transition:.15s;white-space:nowrap;font-size:11px;}
+.hb:hover{border-color:var(--ac);color:var(--t);}.hb.pr{background:var(--ac);border-color:var(--ac);color:#fff;}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;padding:5px 20px;background:var(--s);border-bottom:1px solid var(--bd);position:sticky;top:39px;z-index:49;flex-wrap:wrap;}
+.tab{padding:6px 12px;border-radius:5px;border:none;background:transparent;color:var(--t2);font-weight:500;transition:.15s;font-size:11px;}
+.tab:hover{color:var(--t);background:var(--s2);}.tab.on{background:var(--ac);color:#fff;}
+.sec{display:none;padding:16px 20px;}.sec.on{display:block;}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:16px;}
+.kpi{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:12px;}
+.kpi .lb{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.kpi .vl{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;}
+.kpi .sub{font-size:9px;color:var(--t3);margin-top:2px;}
+
+/* Cards / Grid */
+.cg{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));}
+.cd{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:14px;transition:.2s;overflow:hidden;}
+.cd:hover{border-color:var(--ac);}
+.cd h3{font-size:12px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.fw{grid-column:1/-1;}
+
+/* Tables */
+.dt{width:100%;border-collapse:collapse;}
+.dt th{text-align:left;padding:6px 8px;font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--bd);background:var(--s2);}
+.dt td{padding:6px 8px;border-bottom:1px solid var(--bd);font-size:11px;}
+.dt tr:hover td{background:var(--s2);}
+.dt .num{text-align:right;font-variant-numeric:tabular-nums;}
+.pos{color:var(--g);}.neg{color:var(--r);}.warn{color:var(--o);}
+
+/* Editable cells */
+.dt input.ce{background:transparent;border:1px solid transparent;color:var(--bl);width:80px;text-align:right;padding:2px 4px;font-variant-numeric:tabular-nums;font-size:11px;}
+.dt input.ce:focus{border-color:var(--ac);background:rgba(108,124,255,.08);}
+.dt input.ce:hover{border-color:var(--bd);}
+
+/* Badges */
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:600;}
+.bg{background:rgba(52,211,153,.12);color:var(--g);}
+.bo{background:rgba(251,191,36,.12);color:var(--o);}
+.br{background:rgba(248,113,113,.12);color:var(--r);}
+.bb{background:rgba(96,165,250,.12);color:var(--bl);}
+.bp{background:rgba(167,139,250,.12);color:var(--pu);}
+.bk{background:rgba(244,114,182,.12);color:var(--pk);}
+
+/* Agent cards */
+.ag{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:12px;transition:.2s;}
+.ag:hover{border-color:var(--ac);}
+.ag-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.ag-h h3{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;margin:0;}
+.ag-n{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;flex-shrink:0;}
+.ag-d{color:var(--t2);font-size:11px;margin-bottom:10px;line-height:1.6;}
+.ag-tags{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.ag-tag{background:var(--s2);border:1px solid var(--bd);padding:2px 8px;border-radius:3px;font-size:9px;color:var(--t2);}
+.pbox{position:relative;}
+.pa{width:100%;min-height:160px;background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--t);padding:10px;resize:vertical;line-height:1.65;font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:11px;}
+.pa:focus{border-color:var(--ac);}
+.cbtn{position:absolute;top:6px;right:6px;background:var(--ac);border:none;color:#fff;padding:4px 12px;border-radius:4px;font-size:10px;font-weight:600;opacity:.7;transition:.15s;}
+.cbtn:hover{opacity:1;}.cbtn.ok{background:var(--g);}
+
+/* Intel entries */
+.ie{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px;transition:.2s;}
+.ie:hover{border-color:var(--ac);}
+.ie-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.ie-date{font-size:9px;color:var(--t3);}
+.ie-src{font-size:9px;color:var(--bl);margin-left:auto;}
+.ie-body{font-size:11.5px;line-height:1.7;margin-bottom:6px;}
+.ie-action{font-size:11px;color:var(--ac);font-weight:500;margin-bottom:8px;padding:6px 8px;background:rgba(108,124,255,.06);border-radius:4px;}
+
+/* Comments */
+.cmt-area{border-top:1px solid var(--bd);padding-top:8px;margin-top:8px;}
+.cmt{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;padding:6px 8px;background:var(--s2);border-radius:4px;}
+.cmt-icon{color:var(--o);font-size:10px;flex-shrink:0;margin-top:2px;}
+.cmt-text{font-size:10.5px;color:var(--t2);line-height:1.5;flex:1;}
+.cmt-date{font-size:9px;color:var(--t3);flex-shrink:0;}
+.cmt-input{display:flex;gap:6px;margin-top:6px;}
+.cmt-input input{flex:1;padding:5px 8px;}
+.cmt-input button{padding:5px 12px;white-space:nowrap;}
+
+/* Competitor tracker */
+.comp-card{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px;}
+.comp-card h4{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+
+/* Run history */
+.rh-item{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px;}
+.rh-item .rh-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;}
+.rh-item .rh-body{display:none;border-top:1px solid var(--bd);padding-top:10px;margin-top:4px;}
+.rh-item.open .rh-body{display:block;}
+.rh-toggle{color:var(--t3);font-size:10px;margin-left:auto;}
+
+/* Modal */
+.modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:center;justify-content:center;}
+.modal-bg.on{display:flex;}
+.modal{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:24px;width:560px;max-width:90vw;max-height:80vh;overflow-y:auto;}
+.modal h2{font-size:14px;font-weight:700;margin-bottom:16px;}
+.modal label{display:block;font-size:11px;color:var(--t2);margin-bottom:4px;margin-top:10px;}
+.modal input,.modal textarea,.modal select{width:100%;}
+.modal textarea{min-height:80px;resize:vertical;}
+.modal-btns{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;}
+
+@media(max-width:768px){.cg{grid-template-columns:1fr;}.kpi-row{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <h1><span>Dr.Felis</span> Japan Market Intelligence</h1>
+  <div class="hd-r">
+    <button class="hb" onclick="exportAll()">Export All</button>
+    <button class="hb" onclick="resetData()" style="color:var(--r)">Reset</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" data-t="overview">Overview</button>
+  <button class="tab" data-t="agents">Agent Prompts</button>
+  <button class="tab" data-t="runs">Agent 실행 이력</button>
+  <button class="tab" data-t="intel">Market Intelligence</button>
+  <button class="tab" data-t="comp">경쟁사 트래킹</button>
+  <button class="tab" data-t="sku">SKU 손익 분석</button>
+  <button class="tab" data-t="howto">사용 가이드</button>
+</div>
+
+<!-- ========== OVERVIEW ========== -->
+<div class="sec on" id="s-overview">
+<div class="kpi-row" id="kpiRow"></div>
+<div class="cg">
+  <div class="cd fw" id="overviewInsights"></div>
+  <div class="cd" id="overviewAgentStatus"></div>
+  <div class="cd" id="overviewRoutine"></div>
+  <div class="cd fw" id="overviewSkuSummary"></div>
+  <div class="cd fw" id="overviewRecentComments"></div>
+</div>
+</div>
+
+<!-- ========== AGENT PROMPTS ========== -->
+<div class="sec" id="s-agents"></div>
+
+<!-- ========== AGENT RUNS ========== -->
+<div class="sec" id="s-runs">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h2 style="font-size:14px;font-weight:700;">Agent 실행 이력</h2>
+    <button class="hb pr" onclick="openRunModal()">+ 실행 결과 기록</button>
+  </div>
+  <div id="runsList"></div>
+</div>
+
+<!-- ========== INTEL ========== -->
+<div class="sec" id="s-intel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h2 style="font-size:14px;font-weight:700;">Market Intelligence</h2>
+    <div style="display:flex;gap:6px;">
+      <select id="intelFilter" onchange="renderIntel()" style="padding:5px 8px;">
+        <option value="all">전체</option><option value="시장">시장</option><option value="경쟁">경쟁</option>
+        <option value="소비자">소비자</option><option value="채널">채널</option><option value="브랜드">브랜드</option>
+      </select>
+      <button class="hb pr" onclick="openIntelModal()">+ 인사이트 추가</button>
+    </div>
+  </div>
+  <div id="intelList"></div>
+</div>
+
+<!-- ========== COMPETITOR ========== -->
+<div class="sec" id="s-comp">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <h2 style="font-size:14px;font-weight:700;">Amazon JP / Rakuten 경쟁사 트래킹</h2>
+    <button class="hb pr" onclick="openCompModal()">+ 경쟁사 추가</button>
+  </div>
+  <div id="compList"></div>
+</div>
+
+<!-- ========== SKU ========== -->
+<div class="sec" id="s-sku">
+  <h2 style="font-size:14px;font-weight:700;margin-bottom:6px;">SKU 손익 분석</h2>
+  <p style="color:var(--bl);font-size:10px;margin-bottom:12px;">파란색 셀 = 직접 편집 가능 | 검은색 = 자동 계산</p>
+  <div class="cd fw" style="overflow-x:auto;" id="skuTableWrap"></div>
+  <div class="cg" style="margin-top:12px;">
+    <div class="cd" id="skuOptions"></div>
+    <div class="cd" id="skuSummary"></div>
+  </div>
+</div>
+
+<!-- ========== HOWTO ========== -->
+<div class="sec" id="s-howto">
+  <h2 style="font-size:14px;font-weight:700;margin-bottom:16px;">사용 가이드</h2>
+  <div class="cd fw" id="howtoContent"></div>
+</div>
+
+<!-- ========== MODALS ========== -->
+<div class="modal-bg" id="intelModal">
+  <div class="modal">
+    <h2>인사이트 추가</h2>
+    <label>카테고리</label>
+    <select id="imCat"><option>시장</option><option>경쟁</option><option>소비자</option><option>채널</option><option>브랜드</option></select>
+    <label>Agent (출처)</label>
+    <input id="imAgent" placeholder="예: Agent 1, 수동 입력">
+    <label>내용 (디테일하게)</label>
+    <textarea id="imBody" placeholder="수치, 데이터, 구체적 사실 기반으로 작성"></textarea>
+    <label>출처 URL</label>
+    <input id="imSrc" placeholder="https://...">
+    <label>Dr.Felis 시사점 (우리가 어떻게 대응할 것인가)</label>
+    <textarea id="imAction" placeholder="이 데이터가 Dr.Felis에 주는 의미와 대응 방향"></textarea>
+    <div class="modal-btns">
+      <button class="hb" onclick="closeModal('intelModal')">취소</button>
+      <button class="hb pr" onclick="saveIntel()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="runModal">
+  <div class="modal">
+    <h2>Agent 실행 결과 기록</h2>
+    <label>Agent</label>
+    <select id="rmAgent"><option>Agent 1: Market Structure</option><option>Agent 2: Consumer Culture</option><option>Agent 3: Channel & Price</option><option>Agent 4: Brand Position</option><option>Agent 5: Strategic Advisor</option></select>
+    <label>실행 결과 (Claude 응답 전체 또는 요약)</label>
+    <textarea id="rmBody" style="min-height:200px;" placeholder="Claude의 분석 결과를 붙여넣으세요"></textarea>
+    <label>핵심 발견 (1-3줄 요약)</label>
+    <textarea id="rmKey" placeholder="이번 실행에서 가장 중요한 발견"></textarea>
+    <div class="modal-btns">
+      <button class="hb" onclick="closeModal('runModal')">취소</button>
+      <button class="hb pr" onclick="saveRun()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="compModal">
+  <div class="modal">
+    <h2>경쟁사 / 경쟁 상품 추가</h2>
+    <label>플랫폼</label>
+    <select id="cmPlat"><option>Amazon JP</option><option>Rakuten</option></select>
+    <label>브랜드명</label>
+    <input id="cmBrand" placeholder="예: いなば CIAO">
+    <label>상품명</label>
+    <input id="cmProduct" placeholder="예: ちゅ〜る まぐろ 14g×4本">
+    <label>가격 (¥)</label>
+    <input id="cmPrice" type="number" placeholder="298">
+    <label>용량</label>
+    <input id="cmSize" placeholder="예: 56g (14g×4)">
+    <label>카테고리</label>
+    <select id="cmCat"><option>페이스트/츄르</option><option>스틱</option><option>시니어 전용</option><option>기능성</option><option>프리미엄</option><option>기타</option></select>
+    <label>비고 (리뷰수, 평점, 특이사항 등)</label>
+    <textarea id="cmNote" placeholder="리뷰 2,340개, 평점 4.5, BSR #3 등"></textarea>
+    <label>출처 URL</label>
+    <input id="cmUrl" placeholder="https://amazon.co.jp/dp/...">
+    <div class="modal-btns">
+      <button class="hb" onclick="closeModal('compModal')">취소</button>
+      <button class="hb pr" onclick="saveComp()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA STORE =====
+const LS=k=>JSON.parse(localStorage.getItem('drf_'+k)||'null');
+const SS=(k,v)=>localStorage.setItem('drf_'+k,JSON.stringify(v));
+
+let DATA={
+  skus:[
+    {code:'DR10042',name:'포켓츄 치킨',size:'56g (4p)',exw:1097,ddp:1895,price:498,logistics:3700,commission:10,tax:10,margin:-122,status:'적자',role:'체험 유도 (번들 필수)'},
+    {code:'DR10043',name:'포켓츄 참치',size:'56g (4p)',exw:1010,ddp:1808,price:498,logistics:3700,commission:10,tax:10,margin:-119,status:'적자',role:'맛 바리에이션'},
+    {code:'DR10044',name:'포켓츄 연어',size:'56g (4p)',exw:1032,ddp:1830,price:498,logistics:3700,commission:10,tax:10,margin:-120,status:'적자',role:'맛 바리에이션'},
+    {code:'DR10063',name:'데일리솔루션 퍼펙트 치킨',size:'150g (15p)',exw:3229,ddp:4027,price:1080,logistics:3700,commission:10,tax:10,margin:15.6,status:'수익',role:'일상 급여, 재구매 엔진'},
+    {code:'DR10064',name:'데일리솔루션 퍼펙트 연어',size:'150g (15p)',exw:3433,ddp:4232,price:1080,logistics:3700,commission:10,tax:10,margin:13.9,status:'수익',role:'맛 바리에이션'},
+    {code:'DR10067',name:'닥터펠리스 7+ 케어스틱 치킨',size:'150g (15p)',exw:3493,ddp:4291,price:1380,logistics:3700,commission:10,tax:10,margin:13.4,status:'수익',role:'★ 최대 차별화'},
+    {code:'DR10068',name:'닥터펠리스 7+ 케어스틱 연어',size:'150g (15p)',exw:3751,ddp:4550,price:1380,logistics:3700,commission:10,tax:10,margin:11.3,status:'주의',role:'맛 바리에이션'},
+  ],
+  intel:[
+    {id:1,date:'2026-04-21',cat:'시장',agent:'Agent 1 초기 실행',body:'일본 펫푸드 시장 5,122억엔 (2026 전망, 2023 대비 +7.7%). 간식 CAGR 5.86% (2025-2031). 고양이 885만 마리, 개 684만 마리. 간식(おやつ) 급여의 습관화로 간식 카테고리가 펫푸드 내 가장 빠른 성장 세그먼트. 프리미엄화 가속 중 — 메이커들이 고부가가치 상품으로 매출 확대 주력.',src:'https://www.imarcgroup.com/japan-pet-food-market',action:'간식 카테고리 진입 타이밍 적절. CAGR 5.86%의 성장 시장에 올라타는 전략 유효. 특히 프리미엄 기능성 간식은 시장 성장의 핵심 드라이버.',comments:[]},
+    {id:2,date:'2026-04-21',cat:'경쟁',agent:'Agent 1 초기 실행',body:'시니어(7+) 전용 기능성 스틱 간식 시장 — いなば도 시니어용 CIAO를 출시했으나 "11歳以上" 등 연령 표기만 있을 뿐 기능성 깊이가 얕음. ユニチャーム "銀のスプーン"도 시니어 라인 존재하나 기능성 차별화 미약. "수의사가 개발한 시니어 전용 기능성 스틱"이라는 포지션은 대형 브랜드가 장악하지 못한 영역. 시니어 고양이 비율은 전체의 50%+ (평균 수명 15.7세).',src:'https://my-best.com/3119',action:'Dr.Felis 7+ 케어스틱이 이 빈 공간을 차지할 수 있음. "獣医師開発 × 7歳以上ケア" = 경쟁사 부재 포지션. 이것이 최대 차별화 포인트.',comments:[]},
+    {id:3,date:'2026-04-21',cat:'소비자',agent:'Agent 2 초기 실행',body:'K-Beauty 일본 수입 비중 약 30% (週刊粧業 2025). 일본 K-Beauty 시장 CAGR 8.38% (2025-2035). "ブームを超え脅威" 수준으로 정착. 소비자는 "브랜드보다 성분", "광고보다 리뷰(@cosme 등)"로 구매 결정. K-Beauty 핵심 소비자(25-35세 여성) = 고양이 보호자 핵심층과 동일 인물. 한국산 61.3%가 "비싸도 국산 선택"하나, 오리젠(캐나다), 로얄캐닌(프랑스) 등 해외 프리미엄 성공 사례 다수 존재.',src:'https://syogyo.jp/news/2025/03/post_040788',action:'K-Beauty → K-Pet 전이 가능성 4/5. "韓国の獣医師が開発"을 프리미엄 프레이밍으로 사용. 성분 투명성이 핵심 커뮤니케이션. "国産"과 싸우지 말고 "韓国發 프리미엄"으로 전환.',comments:[]},
+    {id:4,date:'2026-04-21',cat:'채널',agent:'Agent 3 초기 실행',body:'Amazon JP: CIAO ちゅ〜る 4本(56g) ¥200-300. シーバ とろ〜りメルティ 4本(48g) ¥300-400. 銀のスプーン とろリッチ 10本(100g) ¥350-500. 시니어 전용 기능성 간식은 소수. Amazon JP 펫 카테고리 전문점 점유율 34.2%, 온라인 CAGR 4.37%. Rakuten: 포인트 경제권 최대, 30-50대 충성도 높음. 해외 출점 1,000건 돌파 (2025), 한국어 EC컨설턴트 배정.',src:'https://www.amazon.co.jp/gp/bestsellers/pet-supplies/2155310051',action:'포켓츄 ¥498은 シーバ 상위 가격대 — 가격 정당화를 위해 "수의사 개발" 스토리 필수. 150g 라인은 경쟁 제품 대비 합리적 프리미엄.',comments:[]},
+    {id:5,date:'2026-04-21',cat:'브랜드',agent:'원가 분석',body:'포켓츄 56g DDP ₩1,808~1,895. 단품 판매 시 (수수료 10% + 소비세 10% + 물류비) 적용하면 마진 -119~-122%. 데일리솔루션 150g DDP ₩4,027~4,232, 마진 13.9~15.6%. Dr.Felis 7+ 150g DDP ₩4,291~4,550, 마진 11.3~13.4%. 경쟁사 가격(1개입) ¥10,000으로 설정되어 있으나 이는 초기 가설치로 추정.',src:'',action:'포켓츄 단품 판매 불가. 번들(2~3개입) 또는 150g 라인만 우선 런칭 필수. 150g 라인이 수익 엔진. Dr.Felis 7+ 연어(마진 11.3%)는 가격 인상 또는 원가 절감 검토 필요.',comments:[]},
+    {id:6,date:'2026-04-21',cat:'시장',agent:'Agent 1 초기 실행',body:'일본 고양이 보호자 월 평균 지출 11,004엔 (전년비 +8%). 2024 신규 반려동물 입양 80.3만 마리 > 출생아 68.6만 명. 고양이 보호자 50%가 "고양이 중심 생활", 70%가 "외출 시간 줄였다". ネコノミクス(고양이 경제) 약 2조엔 규모.',src:'https://www.nikkei.com/article/DGXZQOUC030KM0T01C25A2000000/',action:'고양이 보호자의 지출이 매년 증가 중. "간식을 주는 행위 = 애정 표현의 의식(ritual)". Dr.Felis는 이 ritual을 "건강 케어"로 업그레이드하는 포지셔닝.',comments:[]},
+  ],
+  competitors:[
+    {id:1,date:'2026-04-21',platform:'Amazon JP',brand:'いなば CIAO',product:'ちゅ〜る まぐろ 14g×4本',price:248,size:'56g (14g×4)',category:'페이스트/츄르',note:'절대 강자. BSR #1 카테고리. 리뷰 수만 건. 대중 최저가 포지션.',url:'https://www.amazon.co.jp/dp/B007QN0E3W',history:[{date:'2026-04-21',price:248}]},
+    {id:2,date:'2026-04-21',platform:'Amazon JP',brand:'いなば CIAO',product:'ちゅ〜る まぐろ&かつおバラエティ 14g×40本',price:1580,size:'560g (14g×40)',category:'페이스트/츄르',note:'대용량 가성비팩. 정기구매 다수. BSR 상위.',url:'https://www.amazon.co.jp/dp/B014R0FZN0',history:[{date:'2026-04-21',price:1580}]},
+    {id:3,date:'2026-04-21',platform:'Amazon JP',brand:'いなば CIAO',product:'ちゅ〜る 贅沢バラエティ 80本',price:3200,size:'1120g (14g×80)',category:'페이스트/츄르',note:'최대용량. 코스트코형 대용량. 정기구독 인기.',url:'https://www.amazon.co.jp/dp/B0C2C79Q5W',history:[{date:'2026-04-21',price:3200}]},
+    {id:4,date:'2026-04-21',platform:'Amazon JP',brand:'いなば CIAO',product:'ちゅ〜る 毛玉配慮 まぐろ 4本×6個',price:1200,size:'336g (14g×24)',category:'기능성',note:'모구케어 기능성. Dr.Felis 데일리솔루션 직접 경쟁.',url:'https://www.amazon.co.jp/dp/B00HVQ1IYI',history:[{date:'2026-04-21',price:1200}]},
+    {id:5,date:'2026-04-21',platform:'Amazon JP',brand:'いなば CIAO',product:'ちゅ〜る 11歳からの高齢猫用 バラエティ 40本',price:1680,size:'560g (14g×40)',category:'시니어 전용',note:'★ Dr.Felis 7+ 직접 경쟁. 11歳以上. 콜라겐 배합. 기능성 깊이는 얕음.',url:'https://www.amazon.co.jp/dp/B0CJ4QGKSQ',history:[{date:'2026-04-21',price:1680}]},
+    {id:6,date:'2026-04-21',platform:'Amazon JP',brand:'いなば CIAO',product:'ちゅ〜るごはん シニア猫用バラエティ 14g×36本',price:1500,size:'504g (14g×36)',category:'시니어 전용',note:'총합영양식 시니어용. 간식이 아닌 식사 대용.',url:'https://www.amazon.co.jp/dp/B0F2T1WVDB',history:[{date:'2026-04-21',price:1500}]},
+    {id:7,date:'2026-04-21',platform:'Amazon JP',brand:'シーバ (Sheba)',product:'とろ〜りメルティ まぐろ&かつお 12g×40P',price:1800,size:'480g (12g×40)',category:'프리미엄',note:'프리미엄 페이스트 대표. 후렌치 소구. Dr.Felis 가격대 경쟁사.',url:'https://www.amazon.co.jp/dp/B07GVGFG7M',history:[{date:'2026-04-21',price:1800}]},
+    {id:8,date:'2026-04-21',platform:'Amazon JP',brand:'シーバ (Sheba)',product:'とろ〜りメルティ まぐろ味セレクション 12g×20本',price:950,size:'240g (12g×20)',category:'프리미엄',note:'중용량. 맛 셀렉션.',url:'https://www.amazon.co.jp/dp/B074FKKJS4',history:[{date:'2026-04-21',price:950}]},
+    {id:9,date:'2026-04-21',platform:'Amazon JP',brand:'シーバ (Sheba)',product:'とろ〜りメルティ 自然素材 ささみ&白身魚 4P×6袋',price:1400,size:'288g (12g×24)',category:'프리미엄',note:'자연소재 레시피. 무첨가 소구. Dr.Felis 성분 투명성과 직접 비교됨.',url:'https://www.amazon.co.jp/dp/B09R1LB8MF',history:[{date:'2026-04-21',price:1400}]},
+    {id:10,date:'2026-04-21',platform:'Amazon JP',brand:'シーバ (Sheba)',product:'メルティ 贅沢5種バラエティ 12g×55本 (Amazon限定)',price:2500,size:'660g (12g×55)',category:'프리미엄',note:'Amazon 한정. 대용량 프리미엄.',url:'https://www.amazon.co.jp/dp/B09TWHVZW7',history:[{date:'2026-04-21',price:2500}]},
+    {id:11,date:'2026-04-21',platform:'Amazon JP',brand:'シーバ (Sheba)',product:'とろ〜りメルティ 海の幸4種 12g×4本',price:300,size:'48g (12g×4)',category:'프리미엄',note:'소용량 체험팩. 포켓츄 56g 직접 비교 대상.',url:'https://www.amazon.co.jp/dp/B08TN9QKG3',history:[{date:'2026-04-21',price:300}]},
+    {id:12,date:'2026-04-21',platform:'Amazon JP',brand:'銀のスプーン (ユニチャーム)',product:'とろリッチ 3種アソート まぐろ節&ほたて&さけ 240g (6g×40)',price:1200,size:'240g (6g×40)',category:'스틱',note:'중간 가격대 스틱. 국산 소재. 3맛 어소트.',url:'https://www.amazon.co.jp/dp/B08XY5ZPWR',history:[{date:'2026-04-21',price:1200}]},
+    {id:13,date:'2026-04-21',platform:'Amazon JP',brand:'銀のスプーン (ユニチャーム)',product:'とろリッチ 3種お魚味 108g (6g×18本)',price:450,size:'108g (6g×18)',category:'스틱',note:'중용량 스틱. 가성비.',url:'https://www.amazon.co.jp/dp/B08HL9JHHN',history:[{date:'2026-04-21',price:450}]},
+    {id:14,date:'2026-04-21',platform:'Amazon JP',brand:'銀のスプーン (ユニチャーム)',product:'とろリッチ 腎臓の健康維持用 108g×2',price:800,size:'216g (108g×2)',category:'기능성',note:'★ 신장 건강 기능성. Dr.Felis 7+ 간접 경쟁.',url:'https://www.amazon.co.jp/dp/B0CVNZ9VMH',history:[{date:'2026-04-21',price:800}]},
+    {id:15,date:'2026-04-21',platform:'Amazon JP',brand:'銀のスプーン (ユニチャーム)',product:'とろリッチ 毛玉ケア 108g (6g×18)',price:480,size:'108g (6g×18)',category:'기능성',note:'모구케어 기능성 스틱.',url:'https://www.amazon.co.jp/dp/B0CKSS67DN',history:[{date:'2026-04-21',price:480}]},
+    {id:16,date:'2026-04-21',platform:'Amazon JP',brand:'いなば CIAO',product:'エナジーちゅ〜る まぐろ 14g×4本×6個',price:1100,size:'336g (14g×24)',category:'기능성',note:'에너지 보충용. 기능성 라인.',url:'https://www.amazon.co.jp/dp/B01C6Z8ZQW',history:[{date:'2026-04-21',price:1100}]},
+    {id:17,date:'2026-04-21',platform:'Rakuten',brand:'いなば CIAO',product:'ちゅ〜る 贅沢バラエティ 14g×120本',price:4980,size:'1680g (14g×120)',category:'페이스트/츄르',note:'Rakuten 인기 1위. 최대용량. 포인트 활용 구매 다수.',url:'https://ranking.rakuten.co.jp/daily/215352/',history:[{date:'2026-04-21',price:4980}]},
+    {id:18,date:'2026-04-21',platform:'Rakuten',brand:'シーバ (Sheba)',product:'とろ〜りメルティ 海の幸セレクション',price:350,size:'48g (12g×4)',category:'프리미엄',note:'Rakuten 소용량. 포인트 배율 프로모션 자주 적용.',url:'https://item.rakuten.co.jp/auc-ulmax/4902397853541/',history:[{date:'2026-04-21',price:350}]},
+    {id:19,date:'2026-04-21',platform:'Rakuten',brand:'銀のスプーン (ユニチャーム)',product:'とろリッチ 3種お魚 アソート',price:500,size:'108g (6g×18)',category:'스틱',note:'Rakuten 스틱 카테고리 인기.',url:'https://ranking.rakuten.co.jp/daily/215352/',history:[{date:'2026-04-21',price:500}]},
+    {id:20,date:'2026-04-21',platform:'Amazon JP',brand:'ねこぴゅーれ',product:'無添加ピュア まぐろ 13g×4本',price:280,size:'52g (13g×4)',category:'프리미엄',note:'무첨가 소구. 소규모 프리미엄. Dr.Felis와 유사 포지셔닝.',url:'https://www.amazon.co.jp/gp/bestsellers/pet-supplies/21613881051',history:[{date:'2026-04-21',price:280}]},
+  ],
+  runs:[],
+  userComments:[]
+};
+
+// Load saved data
+const saved=LS('data');
+if(saved){DATA=saved;}
+
+function save(){SS('data',DATA);}
+
+// ===== TAB SWITCHING =====
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+    t.classList.add('on');
+    document.getElementById('s-'+t.dataset.t).classList.add('on');
+  });
+});
+
+// ===== MODAL =====
+function openModal(id){document.getElementById(id).classList.add('on');}
+function closeModal(id){document.getElementById(id).classList.remove('on');}
+function openIntelModal(){openModal('intelModal');}
+function openRunModal(){openModal('runModal');}
+function openCompModal(){openModal('compModal');}
+
+// ===== OVERVIEW =====
+function renderOverview(){
+  const totalIntel=DATA.intel.length;
+  const totalRuns=DATA.runs.length;
+  const totalComp=DATA.competitors.length;
+  const totalComments=DATA.intel.reduce((a,i)=>a+(i.comments?.length||0),0)+DATA.runs.reduce((a,r)=>a+(r.comments?.length||0),0);
+  const profitSkus=DATA.skus.filter(s=>s.margin>0).length;
+  const lossSkus=DATA.skus.filter(s=>s.margin<=0).length;
+  const avgMargin150=DATA.skus.filter(s=>s.size.includes('150g')).reduce((a,s)=>a+s.margin,0)/DATA.skus.filter(s=>s.size.includes('150g')).length;
+  const lastRun=DATA.runs.length?DATA.runs[0].date:'2026-04-21';
+
+  document.getElementById('kpiRow').innerHTML=`
+    <div class="kpi"><div class="lb">Target Market</div><div class="vl" style="color:var(--ac)">Japan</div><div class="sub">Amazon JP + Rakuten</div></div>
+    <div class="kpi"><div class="lb">SKU</div><div class="vl">7</div><div class="sub" style="color:var(--g)">${profitSkus} 수익</div></div>
+    <div class="kpi"><div class="lb">수익 SKU 평균 마진</div><div class="vl ${avgMargin150>10?'pos':'warn'}">${avgMargin150.toFixed(1)}%</div><div class="sub">150g 라인 기준</div></div>
+    <div class="kpi"><div class="lb">적자 SKU</div><div class="vl neg">${lossSkus}</div><div class="sub">포켓츄 56g 단품</div></div>
+    <div class="kpi"><div class="lb">Intelligence</div><div class="vl">${totalIntel}</div><div class="sub">축적된 인사이트</div></div>
+    <div class="kpi"><div class="lb">Agent 실행</div><div class="vl">${totalRuns}</div><div class="sub">누적 실행 횟수</div></div>
+    <div class="kpi"><div class="lb">경쟁사 트래킹</div><div class="vl">${totalComp}</div><div class="sub">모니터링 중 상품</div></div>
+    <div class="kpi"><div class="lb">유저 코멘트</div><div class="vl">${totalComments}</div><div class="sub">피드백 반영 대기</div></div>
+  `;
+
+  // Top insights
+  const catColors={시장:'bb',경쟁:'bo',소비자:'bp',채널:'bg',브랜드:'bk'};
+  let insightHtml='<h3><span class="dot" style="background:var(--ac)"></span>핵심 인사이트 (최신 → 과거)</h3><table class="dt"><tr><th style="width:60px">영역</th><th>인사이트</th><th>Dr.Felis 대응</th><th style="width:50px">출처</th></tr>';
+  DATA.intel.slice(0,8).forEach(i=>{
+    insightHtml+=`<tr><td><span class="badge ${catColors[i.cat]||'bb'}">${i.cat}</span></td><td style="max-width:400px">${i.body.slice(0,120)}${i.body.length>120?'...':''}</td><td style="color:var(--ac);max-width:300px">${i.action.slice(0,100)}${i.action.length>100?'...':''}</td><td>${i.src?`<a href="${i.src}" target="_blank">Link</a>`:'-'}</td></tr>`;
+  });
+  insightHtml+='</table>';
+  document.getElementById('overviewInsights').innerHTML=insightHtml;
+
+  // Agent status
+  const agents=['Market Structure','Consumer Culture','Channel & Price','Brand Position','Strategic Advisor'];
+  const agColors=[`var(--bl)`,`var(--pu)`,`var(--g)`,`var(--o)`,`var(--pk)`];
+  let statusHtml='<h3><span class="dot" style="background:var(--g)"></span>Agent 상태</h3>';
+  agents.forEach((a,i)=>{
+    const lastA=DATA.runs.filter(r=>r.agent.includes(`Agent ${i+1}`));
+    const lastDate=lastA.length?lastA[0].date:'미실행';
+    statusHtml+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)"><span class="dot" style="background:${agColors[i]}"></span><span style="flex:1;font-size:11px">Agent ${i+1}: ${a}</span><span style="font-size:10px;color:var(--t3)">${lastDate}</span></div>`;
+  });
+  document.getElementById('overviewAgentStatus').innerHTML=statusHtml;
+
+  // Routine
+  document.getElementById('overviewRoutine').innerHTML=`
+    <h3><span class="dot" style="background:var(--o)"></span>운영 루틴</h3>
+    <table class="dt"><tr><th>주기</th><th>Agent</th><th>작업</th></tr>
+    <tr><td>매주 월</td><td style="color:var(--bl)">1</td><td>시장 뉴스·동향</td></tr>
+    <tr><td>매주 수</td><td style="color:var(--g)">3</td><td>채널 가격·리뷰 모니터링</td></tr>
+    <tr><td>매주 금</td><td style="color:var(--pk)">5</td><td>주간 전략 브리핑</td></tr>
+    <tr><td>매월 1주</td><td style="color:var(--pu)">2</td><td>소비자 트렌드 심층</td></tr>
+    <tr><td>매월 3주</td><td style="color:var(--o)">4</td><td>포지셔닝 점검</td></tr>
+    <tr><td>매월 말</td><td style="color:var(--pk)">5</td><td>월간 전략 보고서</td></tr></table>`;
+
+  // SKU summary
+  let skuHtml='<h3><span class="dot" style="background:var(--bl)"></span>SKU 수익 구조 요약</h3><table class="dt"><tr><th>라인</th><th>역할</th><th>DDP (₩)</th><th>판매가 (¥)</th><th>마진</th><th>판단</th></tr>';
+  DATA.skus.forEach(s=>{
+    const mc=s.margin>10?'pos':s.margin>0?'warn':'neg';
+    const badge=s.margin>10?'bg':s.margin>0?'bo':'br';
+    skuHtml+=`<tr><td><strong>${s.name}</strong></td><td style="color:var(--t2)">${s.role}</td><td class="num">${s.ddp.toLocaleString()}</td><td class="num">¥${s.price.toLocaleString()}</td><td class="num ${mc}">${s.margin.toFixed(1)}%</td><td><span class="badge ${badge}">${s.status}</span></td></tr>`;
+  });
+  skuHtml+='</table>';
+  document.getElementById('overviewSkuSummary').innerHTML=skuHtml;
+
+  // Recent comments
+  let cmtHtml='<h3><span class="dot" style="background:var(--o)"></span>최근 유저 코멘트 (피드백)</h3>';
+  const allCmts=[];
+  DATA.intel.forEach(i=>(i.comments||[]).forEach(c=>allCmts.push({...c,context:`[Intel] ${i.cat}: ${i.body.slice(0,40)}...`})));
+  DATA.runs.forEach(r=>(r.comments||[]).forEach(c=>allCmts.push({...c,context:`[Run] ${r.agent} (${r.date})`})));
+  allCmts.sort((a,b)=>b.date.localeCompare(a.date));
+  if(!allCmts.length)cmtHtml+='<p style="color:var(--t3);font-size:11px;">아직 코멘트가 없습니다. Intelligence 또는 Agent 실행 이력에서 코멘트를 추가하세요.</p>';
+  allCmts.slice(0,5).forEach(c=>{
+    cmtHtml+=`<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="color:var(--o);font-size:10px;flex-shrink:0">💬</span><span style="flex:1;font-size:10.5px;color:var(--t2)">${c.text}</span><span style="font-size:9px;color:var(--t3)">${c.context}</span></div>`;
+  });
+  document.getElementById('overviewRecentComments').innerHTML=cmtHtml;
+}
+
+// ===== AGENTS =====
+function renderAgents(){
+  const prompts=[
+    {n:1,name:'Market Structure',color:'var(--bl)',freq:'매주 월요일',desc:'일본 펫 시장 구조, 규모, 성장 트렌드, 카테고리별 동향 분석',tags:['시장 규모','카테고리 트렌드','규제 변화','수입 동향','환율'],
+    prompt:`너는 일본 펫 시장 전문 애널리스트다. 아래 작업을 웹서치를 활용하여 수행하라.
+
+[배경]
+- 우리는 한국 고양이 간식 브랜드 Dr.Felis (수의사 개발 브랜드)
+- 일본 시장에 Amazon JP + Rakuten으로 진출 준비 중
+- 상품: 포켓츄(페이스트 56g/4p), 데일리솔루션 퍼펙트(스틱 150g/15p), 닥터펠리스 7+ 케어스틱(시니어 기능성 150g/15p)
+
+[유저 피드백 반영사항]
+${getUserFeedback(1)}
+
+[분석 범위]
+1. 일본 펫푸드/간식 시장 최신 뉴스 (최근 1-2주)
+   - 시장 규모·성장률 업데이트
+   - 신규 정책·규제 변화
+2. 고양이 간식 카테고리 동향
+   - 페이스트/스틱 타입 시장 변화
+   - 프리미엄·기능성 간식 트렌드
+3. 시니어 고양이(7세+) 관련 시장 동향
+   - 시니어 전용 간식 신제품
+   - 수의사 감수 제품 동향
+4. 수입 펫푸드·한국 브랜드 동향
+5. 환율 (원/엔) 동향
+
+[출력 형식]
+- 각 항목에 구체적 수치·데이터 포함 (추상적 서술 금지)
+- 모든 데이터의 출처(URL) 명시
+- 각 항목별 "Dr.Felis에 대한 시사점" 1-2줄 필수
+- 마지막에 "이번 주 핵심 시사점 TOP 3" + "다음 주 확인 사항" 정리`},
+    {n:2,name:'Consumer Culture',color:'var(--pu)',freq:'매월 첫째 주',desc:'일본 고양이 보호자 소비 감성, SNS 트렌드, K-Pet 인식 변화',tags:['소비자 감성','SNS 트렌드','K-Beauty→K-Pet','리뷰 분석','인플루언서'],
+    prompt:`너는 일본 소비자 문화 및 펫 트렌드 전문 리서처다. 아래 작업을 웹서치를 활용하여 수행하라.
+
+[배경]
+- 한국 고양이 간식 브랜드 Dr.Felis의 일본 시장 진출
+- 핵심 메시지: "韓国の獣医師が開発した、猫のための丁寧なおやつ"
+- Dr.Felis 7+는 시니어(7세+) 전용 기능성 케어스틱
+- 경쟁사의 세세한 활동보다 "Dr.Felis가 어떻게 성장할 것인가"에 집중
+
+[유저 피드백 반영사항]
+${getUserFeedback(2)}
+
+[분석 범위]
+1. 일본 고양이 보호자 소비 트렌드 (최신)
+   - 간식 선택 기준 변화 (안전성, 기능성, 가격)
+   - 시니어 고양이 케어 관련 소비 행동
+   - 프리미엄 간식에 대한 가격 감도
+2. SNS·인플루언서 트렌드
+   - Instagram #猫おやつ #猫スタグラム 최신 동향
+   - TikTok/YouTube 고양이 콘텐츠 변화
+   - 펫 인플루언서 협찬 시장 동향 (단가, 형태)
+3. K-Beauty → K-Pet 전이 현황
+   - 한국 브랜드 일본 소비자 인식 변화
+   - K-Pet 카테고리 형성 여부
+4. 경쟁사 리뷰에서 도출되는 소비자 니즈
+   - CIAO, シーバ 최신 리뷰 키워드 분석 (불만·선호)
+   - 시니어 전용 간식 리뷰의 핵심 기대
+
+[출력 형식]
+- 구체적 데이터·수치·사례 포함 (추상적 서술 금지)
+- 출처(URL) 명시
+- "Dr.Felis 커뮤니케이션 권고" 3가지로 마무리`},
+    {n:3,name:'Channel & Price',color:'var(--g)',freq:'매주 수요일',desc:'Amazon JP / Rakuten 경쟁 가격, 카테고리 랭킹, 프로모션 동향',tags:['Amazon JP','Rakuten','가격 동향','프로모션','BSR'],
+    prompt:`너는 일본 이커머스 플랫폼 분석 전문가다. 아래 작업을 웹서치를 활용하여 수행하라.
+
+[배경]
+- Dr.Felis 상품 라인업 (Amazon JP + Rakuten 판매 예정):
+  · 포켓츄 치킨/참치/연어 56g (4p) — 체험팩, 예상 ¥498
+  · 데일리솔루션 퍼펙트 치킨/연어 150g (15p) — 일상급여, 예상 ¥1,080
+  · Dr.Felis 7+ 케어스틱 치킨/연어 150g (15p) — 시니어 기능성, 예상 ¥1,380
+- 원가: 포켓츄 단품 적자. 150g 라인 마진 11-16%
+- 주요 경쟁사: いなば CIAO, シーバ メルティ, 銀のスプーン
+
+[유저 피드백 반영사항]
+${getUserFeedback(3)}
+
+[분석 범위]
+1. Amazon JP "猫おやつ" 카테고리
+   - 베스트셀러 Top 20 리스트 (제품명, 가격, 리뷰수, 평점)
+   - 페이스트/스틱 타입 중심 가격대 분석
+   - 시니어 전용 간식 존재 여부 및 가격
+   - 해외(한국) 브랜드 존재 여부
+2. Rakuten "猫 おやつ" 카테고리
+   - 인기 상품 가격대
+   - 포인트 배율 트렌드
+3. 경쟁사 프로모션
+   - CIAO, シーバ, 銀のスプーン 세일/쿠폰 현황
+   - 신제품 출시 동향
+4. 가격 적정성 판단
+   - Dr.Felis ¥498/¥1,080/¥1,380이 시장 내 어디에 위치하는지
+   - 가격 조정 필요 여부
+5. 번들 전략 분석
+   - Amazon JP에서 번들 판매 중인 유사 제품 사례
+   - 포켓츄 적자 해결을 위한 번들 옵션 제안
+
+[출력 형식]
+- 경쟁사 가격 비교표 (브랜드, 제품명, 용량, 가격, g당 단가, 리뷰수)
+- Dr.Felis 가격 적정성 판단 (높다/적정/낮다 + 근거)
+- 번들 전략 구체안
+- 출처(URL) 명시`},
+    {n:4,name:'Brand Position',color:'var(--o)',freq:'매월 셋째 주',desc:'Dr.Felis 포지셔닝 점검, 브랜드 성장 기회, 오프라인 접점',tags:['포지셔닝','차별화','성장 기회','오프라인','InterPets'],
+    prompt:`너는 펫 브랜드 전략 컨설턴트다. 아래 작업을 웹서치를 활용하여 수행하라.
+
+[배경]
+- 브랜드: Dr.Felis (수의사 개발 고양이 간식)
+- 포지셔닝: "韓国の獣医師が開発した猫おやつ" — 프리미엄 기능성
+- 핵심 차별화: 수의사 개발, 성분 투명성, 시니어 전용(7+) 케어스틱
+- 경쟁 회피: いなば CIAO (가격 경쟁 불가)
+- 간접 경쟁: シーバ メルティ, 銀のスプーン
+
+[유저 피드백 반영사항]
+${getUserFeedback(4)}
+
+[분석 범위]
+1. 경쟁 환경 변화
+   - 프리미엄/기능성 간식 시장 신규 진입자
+   - 해외 브랜드(특히 한국) 일본 진출 동향
+   - 대형사 프리미엄 라인 확장 동향
+2. 오프라인 접점 기회
+   - InterPets 등 펫 전시회 최신 동향
+   - 猫の日, 猫カフェ 등 문화 이벤트 캘린더
+   - 프리미엄 펫샵 동향
+3. 브랜드 성장 기회
+   - 시니어 고양이 시장 구체 데이터
+   - 기능성 간식 수요 변화
+   - 수의사 감수 브랜드 일본 내 사례
+4. Dr.Felis 포지셔닝 검증
+   - 현재 포지셔닝이 유효한지
+   - 조정이 필요하다면 어떤 방향으로
+
+[출력 형식]
+- "Dr.Felis가 움직여야 할 것" 관점에서만 분석
+- 경쟁사 세부 활동 나열 금지 → 기회/위협만 도출
+- 포지셔닝 맵 (텍스트 기반) 업데이트
+- "이번 달 브랜드 액션 권고 TOP 3"
+- 출처(URL) 명시`},
+    {n:5,name:'Strategic Advisor',color:'var(--pk)',freq:'매주 금 / 매월 말',desc:'Agent 1~4 결과 종합, 실행 가능한 전략 권고 도출',tags:['종합 전략','실행 권고','KPI','리스크'],
+    prompt:`너는 고양이 용품 제조·수출 기업의 전략 운영 비서 역할을 수행한다. 30년 경력의 세계 최정상급 전문가이다.
+
+[비즈니스 상황]
+- 브랜드: Dr.Felis (수의사 개발 고양이 간식)
+- 일본 시장 진출: Amazon JP + Rakuten
+- 상품: 포켓츄(56g/4p), 데일리솔루션(150g/15p), Dr.Felis 7+ 케어스틱(150g/15p)
+- 대전략: 기존 한국 내수 상품 → 일본 런칭 → 시장 반응 확인 → 필요시 현지화
+- 원가: 포켓츄 단품 적자(-122%), 150g 라인 마진 11-16%
+
+[유저 피드백 반영사항]
+${getUserFeedback(5)}
+
+[이번 주 Agent 분석 결과]
+아래에 Agent 1~4의 분석 결과를 붙여넣으세요:
+---
+(여기에 결과 붙여넣기)
+---
+
+[출력 형식 — 주간 브리핑]
+1. 이번 주 핵심 변화 TOP 3 (수치 기반, 추상적 서술 금지)
+2. Dr.Felis가 이번 주 실행해야 할 것 3가지 (구체적 액션)
+3. 주의해야 할 리스크 (Flag)
+4. 포켓츄 적자 해결 상태 업데이트
+5. 다음 주 확인 사항
+
+답변 원칙:
+- 명쾌하고 결단력 있는 보고서 형태
+- 리스크 즉시 Flag
+- 표, 불렛포인트 활용 가독성 극대화
+- 경쟁사 세부 활동보다 "Dr.Felis 성장 방향"에 집중`}
+  ];
+
+  let html='<p style="color:var(--t2);margin-bottom:16px;font-size:11px;">각 Agent 프롬프트를 <strong style="color:var(--ac)">Copy</strong>하여 Claude에 붙여넣으면 최신 분석이 실행됩니다. 유저 코멘트가 있으면 프롬프트에 자동 반영됩니다.</p>';
+  prompts.forEach(p=>{
+    html+=`<div class="ag"><div class="ag-h"><h3><span class="ag-n" style="background:${p.color}">${p.n}</span>${p.name}</h3><span class="badge bb">${p.freq}</span></div>
+    <div class="ag-d">${p.desc}</div>
+    <div class="ag-tags">${p.tags.map(t=>`<span class="ag-tag">${t}</span>`).join('')}</div>
+    <div class="pbox"><button class="cbtn" onclick="copyP(this)">Copy</button><textarea class="pa" readonly>${p.prompt}</textarea></div></div>`;
+  });
+  document.getElementById('s-agents').innerHTML=html;
+}
+
+function getUserFeedback(agentNum){
+  const cmts=[];
+  DATA.runs.filter(r=>r.agent.includes(`Agent ${agentNum}`)).forEach(r=>{
+    (r.comments||[]).forEach(c=>cmts.push(c.text));
+  });
+  DATA.intel.forEach(i=>{
+    (i.comments||[]).forEach(c=>{
+      if(c.text.includes(`Agent ${agentNum}`)||c.forAgent===agentNum)cmts.push(c.text);
+    });
+  });
+  if(!cmts.length)return '(아직 유저 피드백 없음)';
+  return cmts.map((c,i)=>`${i+1}. ${c}`).join('\n');
+}
+
+function copyP(btn){
+  const ta=btn.parentElement.querySelector('.pa');
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},1500);
+  });
+}
+
+// ===== INTEL =====
+function renderIntel(){
+  const filter=document.getElementById('intelFilter').value;
+  const items=filter==='all'?DATA.intel:DATA.intel.filter(i=>i.cat===filter);
+  const catColors={시장:'bb',경쟁:'bo',소비자:'bp',채널:'bg',브랜드:'bk'};
+
+  let html='';
+  items.forEach((item,idx)=>{
+    const cmtHtml=(item.comments||[]).map(c=>`<div class="cmt"><span class="cmt-icon">💬</span><span class="cmt-text">${c.text}</span><span class="cmt-date">${c.date}</span></div>`).join('');
+
+    html+=`<div class="ie">
+      <div class="ie-top">
+        <span class="ie-date">${item.date}</span>
+        <span class="badge ${catColors[item.cat]||'bb'}">${item.cat}</span>
+        <span style="font-size:9px;color:var(--t3)">${item.agent}</span>
+        ${item.src?`<a class="ie-src" href="${item.src}" target="_blank">${new URL(item.src).hostname}</a>`:''}
+      </div>
+      <div class="ie-body">${item.body}</div>
+      <div class="ie-action">→ Dr.Felis 시사점: ${item.action}</div>
+      <div class="cmt-area">
+        ${cmtHtml}
+        <div class="cmt-input">
+          <input id="cmt-i-${item.id}" placeholder="코멘트 추가 (이 인사이트에 대한 피드백, 추가 지시 등)">
+          <button class="hb" onclick="addIntelComment(${item.id})">추가</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('intelList').innerHTML=html;
+}
+
+function saveIntel(){
+  const item={
+    id:Date.now(),
+    date:new Date().toISOString().slice(0,10),
+    cat:document.getElementById('imCat').value,
+    agent:document.getElementById('imAgent').value||'수동 입력',
+    body:document.getElementById('imBody').value,
+    src:document.getElementById('imSrc').value,
+    action:document.getElementById('imAction').value,
+    comments:[]
+  };
+  if(!item.body){alert('내용을 입력하세요');return;}
+  DATA.intel.unshift(item);save();
+  closeModal('intelModal');
+  ['imCat','imAgent','imBody','imSrc','imAction'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+}
+
+function addIntelComment(id){
+  const input=document.getElementById('cmt-i-'+id);
+  if(!input.value.trim())return;
+  const item=DATA.intel.find(i=>i.id===id);
+  if(!item.comments)item.comments=[];
+  item.comments.push({text:input.value.trim(),date:new Date().toISOString().slice(0,10)});
+  save();input.value='';renderAll();
+}
+
+// ===== RUNS =====
+function renderRuns(){
+  let html='';
+  DATA.runs.forEach((run,idx)=>{
+    const cmtHtml=(run.comments||[]).map(c=>`<div class="cmt"><span class="cmt-icon">💬</span><span class="cmt-text">${c.text}</span><span class="cmt-date">${c.date}</span></div>`).join('');
+
+    html+=`<div class="rh-item ${idx===0?'open':''}" onclick="this.classList.toggle('open')">
+      <div class="rh-head">
+        <span class="badge bb">${run.agent}</span>
+        <span style="font-size:10px;color:var(--t3)">${run.date}</span>
+        <span style="flex:1;font-size:11px;color:var(--t2);margin-left:8px;">${run.key||''}</span>
+        <span class="rh-toggle">▼</span>
+      </div>
+      <div class="rh-body" onclick="event.stopPropagation()">
+        <pre style="white-space:pre-wrap;font-size:11px;color:var(--t2);line-height:1.6;max-height:400px;overflow-y:auto;background:var(--s2);padding:10px;border-radius:6px;margin-bottom:8px;">${run.body}</pre>
+        <div class="cmt-area">
+          <p style="font-size:10px;color:var(--t3);margin-bottom:6px;">코멘트 (이 결과에 대한 피드백 → 다음 실행에 자동 반영)</p>
+          ${cmtHtml}
+          <div class="cmt-input">
+            <input id="cmt-r-${run.id}" placeholder="예: 시니어 시장 데이터를 더 구체적으로, 가격 비교 범위를 넓혀줘 등">
+            <button class="hb" onclick="event.stopPropagation();addRunComment(${run.id})">추가</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+  if(!DATA.runs.length)html='<p style="color:var(--t3);">아직 실행 이력이 없습니다. Agent Prompts에서 프롬프트를 복사하여 Claude에서 실행한 뒤, 결과를 여기에 기록하세요.</p>';
+  document.getElementById('runsList').innerHTML=html;
+}
+
+function saveRun(){
+  const run={
+    id:Date.now(),
+    date:new Date().toISOString().slice(0,10),
+    agent:document.getElementById('rmAgent').value,
+    body:document.getElementById('rmBody').value,
+    key:document.getElementById('rmKey').value,
+    comments:[]
+  };
+  if(!run.body){alert('실행 결과를 입력하세요');return;}
+  DATA.runs.unshift(run);save();
+  closeModal('runModal');
+  ['rmBody','rmKey'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+}
+
+function addRunComment(id){
+  const input=document.getElementById('cmt-r-'+id);
+  if(!input.value.trim())return;
+  const run=DATA.runs.find(r=>r.id===id);
+  if(!run.comments)run.comments=[];
+  run.comments.push({text:input.value.trim(),date:new Date().toISOString().slice(0,10)});
+  save();input.value='';renderAll();
+}
+
+// ===== COMPETITORS =====
+function renderComp(){
+  // Group by brand
+  const byBrand={};
+  DATA.competitors.forEach(c=>{
+    if(!byBrand[c.brand])byBrand[c.brand]=[];
+    byBrand[c.brand].push(c);
+  });
+  const brandColors={'いなば CIAO':'var(--o)','シーバ (Sheba)':'var(--pk)','銀のスプーン (ユニチャーム)':'var(--bl)','ねこぴゅーれ':'var(--pu)'};
+
+  // Summary stats
+  const totalProducts=DATA.competitors.length;
+  const amazonCount=DATA.competitors.filter(c=>c.platform==='Amazon JP').length;
+  const rakutenCount=DATA.competitors.filter(c=>c.platform==='Rakuten').length;
+  const avgPrice=Math.round(DATA.competitors.reduce((a,c)=>a+c.price,0)/totalProducts);
+
+  let html=`<div class="kpi-row" style="margin-bottom:14px;">
+    <div class="kpi"><div class="lb">트래킹 상품</div><div class="vl">${totalProducts}</div></div>
+    <div class="kpi"><div class="lb">Amazon JP</div><div class="vl" style="color:var(--o)">${amazonCount}</div></div>
+    <div class="kpi"><div class="lb">Rakuten</div><div class="vl" style="color:var(--pk)">${rakutenCount}</div></div>
+    <div class="kpi"><div class="lb">평균 가격</div><div class="vl">¥${avgPrice}</div></div>
+    <div class="kpi"><div class="lb">브랜드 수</div><div class="vl">${Object.keys(byBrand).length}</div></div>
+  </div>`;
+
+  // Full table view with channel column
+  html+=`<div class="comp-card"><h4><span class="dot" style="background:var(--ac)"></span>전체 경쟁사 상품 (채널·카테고리별)</h4>
+  <div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap;">
+    <button class="hb" onclick="filterComp('all')" style="font-size:10px">전체</button>
+    <button class="hb" onclick="filterComp('Amazon JP')" style="font-size:10px;color:var(--o)">Amazon JP</button>
+    <button class="hb" onclick="filterComp('Rakuten')" style="font-size:10px;color:var(--pk)">Rakuten</button>
+    <span style="color:var(--bd)">|</span>
+    <button class="hb" onclick="filterCompCat('페이스트/츄르')" style="font-size:10px">페이스트</button>
+    <button class="hb" onclick="filterCompCat('스틱')" style="font-size:10px">스틱</button>
+    <button class="hb" onclick="filterCompCat('기능성')" style="font-size:10px">기능성</button>
+    <button class="hb" onclick="filterCompCat('시니어 전용')" style="font-size:10px;color:var(--ac)">시니어</button>
+    <button class="hb" onclick="filterCompCat('프리미엄')" style="font-size:10px">프리미엄</button>
+  </div>
+  <table class="dt" id="compTable"><thead><tr>
+    <th style="width:55px">채널</th><th>브랜드</th><th>상품명</th><th>가격 (¥)</th><th>용량</th><th>g당 (¥)</th><th>카테고리</th><th style="max-width:220px">비고</th><th>링크</th>
+  </tr></thead><tbody id="compTbody"></tbody></table></div>`;
+
+  // Brand-level breakdown
+  Object.keys(byBrand).forEach(brand=>{
+    const items=byBrand[brand];
+    const color=brandColors[brand]||'var(--t2)';
+    html+=`<div class="comp-card"><h4><span class="dot" style="background:${color}"></span>${brand} (${items.length}개 상품)</h4>
+    <table class="dt"><tr><th style="width:55px">채널</th><th>상품명</th><th>가격</th><th>용량</th><th>g당</th><th>카테고리</th><th>비고</th><th>링크</th></tr>`;
+    items.forEach(c=>{
+      const grams=parseInt(c.size)||1;
+      const gPrice=(c.price/grams).toFixed(1);
+      const platColor=c.platform==='Amazon JP'?'var(--o)':'var(--pk)';
+      html+=`<tr>
+        <td><span class="badge" style="background:${c.platform==='Amazon JP'?'rgba(251,191,36,.12)':'rgba(244,114,182,.12)'};color:${platColor}">${c.platform==='Amazon JP'?'AMZ':'RKT'}</span></td>
+        <td>${c.product}</td>
+        <td class="num" style="font-weight:600">¥${c.price.toLocaleString()}</td>
+        <td>${c.size}</td>
+        <td class="num" style="color:var(--t2)">¥${gPrice}</td>
+        <td><span class="badge bb">${c.category}</span></td>
+        <td style="color:var(--t2);font-size:10px;max-width:200px">${c.note}</td>
+        <td>${c.url?`<a href="${c.url}" target="_blank" style="font-size:10px">상품 페이지 →</a>`:'-'}</td>
+      </tr>`;
+    });
+    html+=`</table></div>`;
+  });
+
+  document.getElementById('compList').innerHTML=html;
+  renderCompTable(DATA.competitors);
+}
+
+function renderCompTable(items){
+  const tbody=document.getElementById('compTbody');
+  if(!tbody)return;
+  let html='';
+  items.forEach(c=>{
+    const grams=parseInt(c.size)||1;
+    const gPrice=(c.price/grams).toFixed(1);
+    const platColor=c.platform==='Amazon JP'?'var(--o)':'var(--pk)';
+    const platBg=c.platform==='Amazon JP'?'rgba(251,191,36,.12)':'rgba(244,114,182,.12)';
+    html+=`<tr>
+      <td><span class="badge" style="background:${platBg};color:${platColor}">${c.platform==='Amazon JP'?'AMZ':'RKT'}</span></td>
+      <td><strong>${c.brand}</strong></td>
+      <td>${c.product}</td>
+      <td class="num" style="font-weight:600">¥${c.price.toLocaleString()}</td>
+      <td>${c.size}</td>
+      <td class="num" style="color:var(--t2)">¥${gPrice}</td>
+      <td><span class="badge bb">${c.category}</span></td>
+      <td style="color:var(--t2);font-size:10px;max-width:200px">${c.note}</td>
+      <td>${c.url?`<a href="${c.url}" target="_blank" style="font-size:10px">→</a>`:'-'}</td>
+    </tr>`;
+  });
+  tbody.innerHTML=html;
+}
+
+function filterComp(platform){
+  const items=platform==='all'?DATA.competitors:DATA.competitors.filter(c=>c.platform===platform);
+  renderCompTable(items);
+}
+function filterCompCat(cat){
+  renderCompTable(DATA.competitors.filter(c=>c.category===cat));
+}
+
+function saveComp(){
+  const comp={
+    id:Date.now(),
+    date:new Date().toISOString().slice(0,10),
+    platform:document.getElementById('cmPlat').value,
+    brand:document.getElementById('cmBrand').value,
+    product:document.getElementById('cmProduct').value,
+    price:parseInt(document.getElementById('cmPrice').value)||0,
+    size:document.getElementById('cmSize').value,
+    category:document.getElementById('cmCat').value,
+    note:document.getElementById('cmNote').value,
+    url:document.getElementById('cmUrl').value,
+    history:[{date:new Date().toISOString().slice(0,10),price:parseInt(document.getElementById('cmPrice').value)||0}]
+  };
+  if(!comp.brand){alert('브랜드명을 입력하세요');return;}
+  DATA.competitors.push(comp);save();
+  closeModal('compModal');
+  ['cmBrand','cmProduct','cmPrice','cmSize','cmNote','cmUrl'].forEach(id=>document.getElementById(id).value='');
+  renderAll();
+}
+
+// ===== SKU =====
+function renderSku(){
+  let html=`<h3><span class="dot" style="background:var(--bl)"></span>SKU 원가·손익 테이블</h3>
+  <table class="dt"><tr><th>코드</th><th>상품명</th><th>용량</th><th>EXW (₩)</th><th>DDP (₩)</th><th>판매가 (¥)</th><th>물류비 (₩/건)</th><th>수수료 %</th><th>소비세 %</th><th>마진율</th><th>상태</th><th>역할</th></tr>`;
+  DATA.skus.forEach((s,i)=>{
+    const mc=s.margin>10?'pos':s.margin>0?'warn':'neg';
+    const badge=s.margin>10?'bg':s.margin>0?'bo':'br';
+    html+=`<tr>
+      <td>${s.code}</td><td><strong>${s.name}</strong></td><td>${s.size}</td>
+      <td><input class="ce" type="number" value="${s.exw}" onchange="updateSku(${i},'exw',this.value)"></td>
+      <td><input class="ce" type="number" value="${s.ddp}" onchange="updateSku(${i},'ddp',this.value)"></td>
+      <td><input class="ce" type="number" value="${s.price}" onchange="updateSku(${i},'price',this.value)"></td>
+      <td><input class="ce" type="number" value="${s.logistics}" onchange="updateSku(${i},'logistics',this.value)"></td>
+      <td><input class="ce" type="number" value="${s.commission}" onchange="updateSku(${i},'commission',this.value)" style="width:50px"></td>
+      <td><input class="ce" type="number" value="${s.tax}" onchange="updateSku(${i},'tax',this.value)" style="width:50px"></td>
+      <td class="num ${mc}" style="font-weight:700">${s.margin.toFixed(1)}%</td>
+      <td><span class="badge ${badge}">${s.status}</span></td>
+      <td style="color:var(--t2)">${s.role}</td>
+    </tr>`;
+  });
+  html+='</table>';
+  document.getElementById('skuTableWrap').innerHTML=html;
+
+  // Options
+  document.getElementById('skuOptions').innerHTML=`
+    <h3><span class="dot" style="background:var(--r)"></span>포켓츄 적자 해결 옵션</h3>
+    <table class="dt"><tr><th>옵션</th><th>설명</th><th>예상 효과</th><th>리스크</th></tr>
+    <tr><td style="font-weight:600">A. 번들 2개입</td><td>2개 묶어 ¥880~950 판매. 물류비 1건 배분.</td><td class="pos">적자 → 소폭 흑자 가능</td><td>번들 SKU 별도 관리</td></tr>
+    <tr><td style="font-weight:600">B. 3맛 세트</td><td>치킨+참치+연어 3종 ¥1,380 판매</td><td class="pos">체험팩으로 최적. 마진 확보 가능</td><td>재고 3종 균형 필요</td></tr>
+    <tr><td style="font-weight:600">C. 1차 제외</td><td>150g 라인만 먼저 런칭. 포켓츄는 시장 반응 후 검토</td><td>리스크 최소화</td><td>소용량 체험 상품 부재</td></tr>
+    <tr><td style="font-weight:600">D. 판매가 인상</td><td>¥498 → ¥680~780. 프리미엄 정당화 필요</td><td>마진 개선</td><td class="neg">경쟁력 저하 우려</td></tr>
+    <tr><td style="font-weight:600">E. 원가 절감</td><td>제조사 변경 또는 용량 조정으로 DDP 절감</td><td>근본 해결</td><td>제조사 선정 중이므로 반영 가능</td></tr></table>`;
+
+  // Summary
+  const profit=DATA.skus.filter(s=>s.margin>0);
+  const loss=DATA.skus.filter(s=>s.margin<=0);
+  const avgP=profit.length?profit.reduce((a,s)=>a+s.margin,0)/profit.length:0;
+  document.getElementById('skuSummary').innerHTML=`
+    <h3><span class="dot" style="background:var(--g)"></span>수익 구조 요약</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div class="kpi"><div class="lb">수익 SKU</div><div class="vl pos">${profit.length}개</div></div>
+      <div class="kpi"><div class="lb">적자 SKU</div><div class="vl neg">${loss.length}개</div></div>
+      <div class="kpi"><div class="lb">수익SKU 평균마진</div><div class="vl ${avgP>10?'pos':'warn'}">${avgP.toFixed(1)}%</div></div>
+    </div>
+    <table class="dt"><tr><th>라인</th><th>역할</th><th>수익성</th><th>전략 판단</th></tr>
+    <tr><td style="color:var(--r)">포켓츄 56g</td><td>체험·유입</td><td class="neg">적자</td><td>번들 or 1차 제외 or 원가 절감 (제조사 선정 시 반영)</td></tr>
+    <tr><td style="color:var(--g)">데일리솔루션 150g</td><td>일상·재구매</td><td class="pos">마진 14-16%</td><td>수익 엔진. Amazon 정기구매(Subscribe) 유도</td></tr>
+    <tr><td style="color:var(--ac)">Dr.Felis 7+ 150g</td><td>프리미엄·차별화</td><td class="pos">마진 11-13%</td><td>최대 차별화. 시니어 카테고리 선점. 가격 인상 여지 있음</td></tr></table>`;
+}
+
+function updateSku(idx,field,val){
+  DATA.skus[idx][field]=parseFloat(val)||0;
+  recalcMargin(idx);
+  save();renderSku();renderOverview();
+}
+
+function recalcMargin(idx){
+  const s=DATA.skus[idx];
+  // Simplified margin calc: (price_krw - ddp - logistics_per_unit) / price_krw * 100
+  // price in yen → convert to krw (approx 9.0 krw per yen)
+  const rate=9.0;
+  const priceKrw=s.price*rate;
+  const commissionAmt=priceKrw*(s.commission/100);
+  const taxAmt=priceKrw*(s.tax/100);
+  const totalCost=s.ddp+s.logistics+commissionAmt+taxAmt;
+  s.margin=((priceKrw-totalCost)/priceKrw*100);
+  s.status=s.margin>10?'수익':s.margin>0?'주의':'적자';
+}
+
+// ===== HOWTO =====
+function renderHowto(){
+  document.getElementById('howtoContent').innerHTML=`
+    <h3><span class="dot" style="background:var(--ac)"></span>이 시스템 사용법</h3>
+    <div style="margin-top:12px;">
+    <div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;">
+      <span style="width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</span>
+      <div><strong>Agent Prompts 탭</strong>에서 실행할 Agent의 "Copy" 클릭<br><span style="color:var(--t2)">주간: 월(Agent 1) → 수(Agent 3) → 금(Agent 5) | 월간: Agent 2, 4 추가</span></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;">
+      <span style="width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</span>
+      <div><strong>Claude Max</strong> (claude.ai)에 붙여넣기 → 실행<br><span style="color:var(--t2)">Claude가 웹서치로 최신 데이터 수집·분석. 유저 코멘트가 있으면 프롬프트에 자동 반영됨.</span></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;">
+      <span style="width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</span>
+      <div><strong>Agent 실행 이력</strong> 탭에 결과 전문 기록<br><span style="color:var(--t2)">"+ 실행 결과 기록" 클릭 → Claude 응답 전체를 붙여넣기. 핵심 발견도 요약 기록.</span></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;">
+      <span style="width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">4</span>
+      <div><strong>코멘트 추가</strong>로 피드백 반영<br><span style="color:var(--t2)">각 실행 결과·인사이트에 코멘트 달기 → 다음 Agent 실행 시 프롬프트에 자동 반영 → 결과 품질 지속 개선</span></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;">
+      <span style="width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">5</span>
+      <div><strong>Market Intelligence</strong>에 핵심 인사이트 축적<br><span style="color:var(--t2)">시간 경과에 따른 시장 변화 추적. 출처(URL) 포함. 카테고리별 필터링 가능.</span></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;">
+      <span style="width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">6</span>
+      <div><strong>경쟁사 트래킹</strong>에 경쟁 상품 등록·가격 추적<br><span style="color:var(--t2)">Amazon JP/Rakuten 경쟁사 상품을 등록하고 가격 이력을 축적. Agent 3 실행 시 참고.</span></div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+      <span style="width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">7</span>
+      <div><strong>SKU 손익 분석</strong>에서 가격·원가 시뮬레이션<br><span style="color:var(--t2)">파란색 셀을 직접 수정하면 마진이 자동 재계산. 제조사 확정 후 원가 업데이트.</span></div>
+    </div>
+    </div>
+    <div style="margin-top:20px;padding:12px;background:var(--s2);border-radius:6px;">
+      <p style="font-size:11px;color:var(--o);font-weight:600;margin-bottom:4px;">핵심 구조: 실행 → 기록 → 코멘트 → 반영 → 개선</p>
+      <p style="font-size:10.5px;color:var(--t2);">유저 코멘트가 쌓일수록 Agent 프롬프트가 정교해지고, 분석 결과가 Dr.Felis에 최적화됩니다.<br>모든 데이터는 브라우저 localStorage에 저장됩니다. Export 버튼으로 백업 가능.</p>
+    </div>`;
+}
+
+// ===== EXPORT / RESET =====
+function exportAll(){
+  const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='drfelis_japan_intel_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+function resetData(){
+  if(!confirm('모든 데이터를 초기화하시겠습니까? (복원 불가)'))return;
+  localStorage.removeItem('drf_data');location.reload();
+}
+
+// ===== RENDER ALL =====
+function renderAll(){renderOverview();renderAgents();renderRuns();renderIntel();renderComp();renderSku();renderHowto();}
+renderAll();
+</script>
+</body>
+</html>

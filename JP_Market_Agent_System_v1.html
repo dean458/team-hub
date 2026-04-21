@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Japan Market Intelligence Agent | Forcat · Felis · Dr.Felis</title>
+<style>
+:root{--bg:#0c0e14;--s:#141620;--s2:#1c1f2e;--s3:#252840;--bd:#2a2e42;--t:#e2e4ef;--t2:#8b90a8;--t3:#5a5f78;--ac:#6c7cff;--ac2:#4e5bdb;--g:#34d399;--r:#f87171;--o:#fbbf24;--bl:#60a5fa;--pu:#a78bfa;--cy:#22d3ee;--pk:#f472b6;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Pretendard',sans-serif;background:var(--bg);color:var(--t);font-size:13px;line-height:1.6;}
+button{cursor:pointer;font-family:inherit;font-size:12px;}
+textarea{font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:11.5px;}
+
+.hd{background:var(--s);border-bottom:1px solid var(--bd);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.hd h1{font-size:15px;font-weight:700;}.hd h1 span{color:var(--ac);}
+.hd-r{display:flex;gap:6px;align-items:center;}
+.hb{background:var(--s2);border:1px solid var(--bd);color:var(--t2);padding:5px 12px;border-radius:5px;transition:.15s;white-space:nowrap;}
+.hb:hover{border-color:var(--ac);color:var(--t);}
+.hb.pr{background:var(--ac);border-color:var(--ac);color:#fff;}
+
+.tabs{display:flex;gap:2px;padding:6px 24px;background:var(--s);border-bottom:1px solid var(--bd);position:sticky;top:43px;z-index:49;flex-wrap:wrap;}
+.tab{padding:7px 14px;border-radius:5px;border:none;background:transparent;color:var(--t2);font-weight:500;transition:.15s;}
+.tab:hover{color:var(--t);background:var(--s2);}
+.tab.on{background:var(--ac);color:#fff;}
+.sec{display:none;padding:20px 24px;}.sec.on{display:block;}
+
+/* Cards */
+.cg{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));}
+.cd{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:18px;transition:.2s;}
+.cd:hover{border-color:var(--ac);}
+.cd h3{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.cd h3 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* Agent Cards */
+.ag-card{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:16px;transition:.2s;}
+.ag-card:hover{border-color:var(--ac);}
+.ag-card .ag-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.ag-card .ag-head h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;margin:0;}
+.ag-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;}
+.ag-desc{color:var(--t2);font-size:12px;margin-bottom:14px;line-height:1.7;}
+.ag-meta{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+.ag-tag{background:var(--s2);border:1px solid var(--bd);padding:3px 10px;border-radius:4px;font-size:10px;color:var(--t2);}
+.prompt-box{position:relative;}
+.prompt-area{width:100%;min-height:180px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;color:var(--t);padding:14px;resize:vertical;line-height:1.7;}
+.prompt-area:focus{outline:none;border-color:var(--ac);}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--ac);border:none;color:#fff;padding:5px 14px;border-radius:5px;font-size:11px;font-weight:600;transition:.15s;opacity:.7;}
+.copy-btn:hover{opacity:1;}
+.copy-btn.copied{background:var(--g);}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px;}
+.kpi{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:14px;}
+.kpi .label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.kpi .val{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;}
+
+/* Data table */
+.dt{width:100%;border-collapse:collapse;margin-top:12px;}
+.dt th{text-align:left;padding:8px 10px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bd);background:var(--s2);}
+.dt td{padding:8px 10px;border-bottom:1px solid var(--bd);font-size:12px;}
+.dt tr:hover td{background:var(--s2);}
+.dt .num{text-align:right;font-variant-numeric:tabular-nums;}
+.dt .pos{color:var(--g);}.dt .neg{color:var(--r);}
+
+/* SKU table */
+.sku-tbl{width:100%;border-collapse:collapse;}
+.sku-tbl th{text-align:left;padding:6px 8px;font-size:10px;color:var(--t3);border-bottom:1px solid var(--bd);}
+.sku-tbl td{padding:6px 8px;font-size:11px;border-bottom:1px solid var(--bd);}
+.sku-tbl tr:hover td{background:var(--s2);}
+
+/* Intelligence log */
+.log-entry{background:var(--s);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px;}
+.log-entry .log-date{font-size:10px;color:var(--t3);margin-bottom:4px;}
+.log-entry .log-cat{display:inline-block;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:600;margin-bottom:6px;}
+.log-entry .log-body{font-size:12px;color:var(--t);line-height:1.7;}
+.log-entry .log-action{font-size:11px;color:var(--ac);margin-top:6px;font-weight:500;}
+.cat-market{background:rgba(96,165,250,.15);color:var(--bl);}
+.cat-comp{background:rgba(251,191,36,.15);color:var(--o);}
+.cat-consumer{background:rgba(167,139,250,.15);color:var(--pu);}
+.cat-channel{background:rgba(52,211,153,.15);color:var(--g);}
+.cat-brand{background:rgba(244,114,182,.15);color:var(--pk);}
+
+/* Fullwidth card */
+.fw{grid-column:1/-1;}
+
+/* Status badges */
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:600;}
+.badge-g{background:rgba(52,211,153,.15);color:var(--g);}
+.badge-o{background:rgba(251,191,36,.15);color:var(--o);}
+.badge-r{background:rgba(248,113,113,.15);color:var(--r);}
+.badge-b{background:rgba(96,165,250,.15);color:var(--bl);}
+
+/* Run history */
+.run-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);}
+.run-item:last-child{border:none;}
+.run-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* How to section */
+.how-step{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;}
+.step-num{width:32px;height:32px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+.step-body h4{font-size:13px;font-weight:600;margin-bottom:4px;}
+.step-body p{font-size:12px;color:var(--t2);line-height:1.7;}
+
+@media(max-width:768px){
+  .cg{grid-template-columns:1fr;}
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .hd{flex-direction:column;gap:8px;}
+}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <h1><span>JP</span> Market Intelligence Agent System</h1>
+  <div class="hd-r">
+    <button class="hb" onclick="exportData()">Export Data</button>
+    <button class="hb pr" onclick="location.reload()">Refresh</button>
+  </div>
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab on" onclick="showTab('overview')">Overview</button>
+  <button class="tab" onclick="showTab('agents')">Agent Prompts</button>
+  <button class="tab" onclick="showTab('intel')">Market Intelligence</button>
+  <button class="tab" onclick="showTab('sku')">SKU & Cost</button>
+  <button class="tab" onclick="showTab('howto')">사용 가이드</button>
+</div>
+
+<!-- ==================== OVERVIEW ==================== -->
+<div class="sec on" id="sec-overview">
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="label">Target Market</div><div class="val" style="color:var(--ac)">Japan</div></div>
+    <div class="kpi"><div class="label">Channel</div><div class="val" style="font-size:16px">Amazon JP<br>Rakuten</div></div>
+    <div class="kpi"><div class="label">SKU Count</div><div class="val">7</div></div>
+    <div class="kpi"><div class="label">Agent Count</div><div class="val">5</div></div>
+    <div class="kpi"><div class="label">Last Run</div><div class="val" style="font-size:16px" id="lastRun">2026-04-21</div></div>
+    <div class="kpi"><div class="label">Intelligence Entries</div><div class="val" id="intelCount">12</div></div>
+  </div>
+
+  <div class="cg">
+
+    <div class="cd">
+      <h3><span class="dot" style="background:var(--ac)"></span>Agent 시스템 상태</h3>
+      <div class="run-item"><span class="run-dot" style="background:var(--g)"></span><span style="flex:1">Agent 1: Market Structure</span><span class="badge badge-g">완료</span></div>
+      <div class="run-item"><span class="run-dot" style="background:var(--g)"></span><span style="flex:1">Agent 2: Consumer Culture</span><span class="badge badge-g">완료</span></div>
+      <div class="run-item"><span class="run-dot" style="background:var(--g)"></span><span style="flex:1">Agent 3: Channel & Touchpoint</span><span class="badge badge-g">완료</span></div>
+      <div class="run-item"><span class="run-dot" style="background:var(--g)"></span><span style="flex:1">Agent 4: Brand Position</span><span class="badge badge-g">완료</span></div>
+      <div class="run-item"><span class="run-dot" style="background:var(--g)"></span><span style="flex:1">Agent 5: Strategic Advisor</span><span class="badge badge-g">완료</span></div>
+    </div>
+
+    <div class="cd">
+      <h3><span class="dot" style="background:var(--o)"></span>운영 루틴</h3>
+      <table class="dt">
+        <tr><th>주기</th><th>Agent</th><th>작업</th></tr>
+        <tr><td>매주 월</td><td style="color:var(--bl)">Agent 1</td><td>시장 뉴스·동향 웹서치</td></tr>
+        <tr><td>매주 수</td><td style="color:var(--g)">Agent 3</td><td>채널 가격·리뷰 모니터링</td></tr>
+        <tr><td>매주 금</td><td style="color:var(--pk)">Agent 5</td><td>주간 전략 브리핑</td></tr>
+        <tr><td>매월 1주</td><td style="color:var(--pu)">Agent 2</td><td>소비자 트렌드 심층분석</td></tr>
+        <tr><td>매월 3주</td><td style="color:var(--o)">Agent 4</td><td>포지셔닝 점검</td></tr>
+        <tr><td>매월 말</td><td style="color:var(--pk)">Agent 5</td><td>월간 전략 보고서</td></tr>
+      </table>
+    </div>
+
+    <div class="cd fw">
+      <h3><span class="dot" style="background:var(--r)"></span>핵심 인사이트 (최신)</h3>
+      <table class="dt">
+        <tr><th>영역</th><th>인사이트</th><th>Forcat 대응</th></tr>
+        <tr><td><span class="badge cat-market">시장</span></td><td>일본 펫푸드 시장 5,122억엔 (CAGR 4.4%), 간식 CAGR 5.86%</td><td>성장 시장 확인 → 진입 타이밍 적절</td></tr>
+        <tr><td><span class="badge cat-comp">경쟁</span></td><td>시니어(7+) 기능성 스틱 간식 = 대형 브랜드 부재 영역</td><td style="color:var(--g);font-weight:600">Dr.Felis 7+ 최대 차별화 포인트</td></tr>
+        <tr><td><span class="badge cat-consumer">소비자</span></td><td>K-Beauty 수입 30%, "브랜드보다 성분"으로 구매 결정</td><td>성분 투명성 + 수의사 감수 = K-Pet 전이 가능</td></tr>
+        <tr><td><span class="badge cat-channel">채널</span></td><td>Amazon JP 펫 카테고리 최대 트래픽, Rakuten 포인트 충성</td><td>Amazon 1순위 → Rakuten 2순위 확정</td></tr>
+        <tr><td><span class="badge cat-brand">원가</span></td><td style="color:var(--r)">포켓츄 56g 단품 판매 시 적자 (-122%)</td><td style="color:var(--o)">번들 판매 필수 or 150g 라인 우선 런칭 검토</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== AGENTS ==================== -->
+<div class="sec" id="sec-agents">
+
+  <p style="color:var(--t2);margin-bottom:20px;font-size:12px;">
+    각 Agent의 프롬프트를 복사하여 <strong style="color:var(--ac)">Claude</strong>에 붙여넣으면 최신 시장 분석이 실행됩니다. "Copy" 버튼으로 복사하세요.
+  </p>
+
+  <!-- Agent 1 -->
+  <div class="ag-card">
+    <div class="ag-head">
+      <h3><span class="ag-num" style="background:var(--bl)">1</span>Market Structure Agent</h3>
+      <span class="badge badge-b">매주 월요일</span>
+    </div>
+    <div class="ag-desc">일본 펫 시장 구조, 규모, 성장 트렌드, 카테고리별 동향을 분석합니다.<br>시장의 "큰 그림"을 업데이트하여 전략 방향을 검증합니다.</div>
+    <div class="ag-meta">
+      <span class="ag-tag">시장 규모</span><span class="ag-tag">카테고리 트렌드</span><span class="ag-tag">규제 변화</span><span class="ag-tag">수입 동향</span>
+    </div>
+    <div class="prompt-box">
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <textarea class="prompt-area" readonly>너는 일본 펫 시장 전문 애널리스트다. 아래 작업을 웹서치를 활용하여 수행하라.
+
+[배경]
+- 우리는 한국 고양이 용품 제조사 (브랜드: Forcat, Dr.Felis)
+- 일본 시장에 Amazon JP + Rakuten으로 진출 준비 중
+- 상품: 포켓츄(페이스트 56g/4p), 데일리솔루션 퍼펙트(스틱 150g/15p), 닥터펠리스 7+ 케어스틱(시니어 기능성 150g/15p)
+
+[이번 주 분석 범위]
+1. 일본 펫푸드/간식 시장 최신 뉴스 (이번 주 기준)
+2. 고양이 간식 카테고리 동향 (특히 페이스트/스틱 타입)
+3. 시니어 고양이(7세+) 관련 시장 변화
+4. 수입 펫푸드 관련 규제·정책 변화
+5. 환율 동향 (원/엔)
+
+[출력 형식]
+- 표와 불렛포인트로 가독성 극대화
+- 각 항목별로 "우리 브랜드에 대한 시사점" 1줄 필수 포함
+- 출처(URL) 명시
+- 마지막에 "이번 주 핵심 시사점 TOP 3" 요약</textarea>
+    </div>
+  </div>
+
+  <!-- Agent 2 -->
+  <div class="ag-card">
+    <div class="ag-head">
+      <h3><span class="ag-num" style="background:var(--pu)">2</span>Consumer Culture Agent</h3>
+      <span class="badge badge-b">매월 첫째 주</span>
+    </div>
+    <div class="ag-desc">일본 고양이 보호자의 소비 감성, SNS 트렌드, K-Pet 인식 변화를 추적합니다.<br>"어떤 이야기로 소비자를 만날 것인가"를 업데이트합니다.</div>
+    <div class="ag-meta">
+      <span class="ag-tag">소비자 감성</span><span class="ag-tag">SNS 트렌드</span><span class="ag-tag">K-Beauty→K-Pet</span><span class="ag-tag">리뷰 분석</span>
+    </div>
+    <div class="prompt-box">
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <textarea class="prompt-area" readonly>너는 일본 소비자 문화 및 펫 트렌드 전문 리서처다. 아래 작업을 웹서치를 활용하여 수행하라.
+
+[배경]
+- 한국 고양이 간식 브랜드 Forcat / Dr.Felis의 일본 시장 진출
+- 타겟: 25-45세 여성 고양이 보호자
+- 핵심 메시지: "韓国の獣医師が開発した、猫のための丁寧なおやつ"
+- Dr.Felis 7+는 시니어(7세+) 전용 기능성 케어스틱
+
+[이번 달 분석 범위]
+1. 일본 고양이 보호자의 최신 소비 트렌드
+   - 간식 선택 기준 변화 (안전성, 기능성, 가격 등)
+   - 시니어 고양이 관련 소비 행동
+2. SNS 트렌드 분석
+   - Instagram #猫おやつ #猫スタグラム 최신 트렌드
+   - TikTok/YouTube 고양이 콘텐츠 동향
+   - 인플루언서 협찬 트렌드 (ペット系インフルエンサー)
+3. K-Beauty → K-Pet 전이 동향
+   - 한국 브랜드에 대한 일본 소비자 인식 변화
+   - Qoo10/Amazon에서 한국 펫 상품 동향
+4. 경쟁사 리뷰 감성 분석
+   - CIAO ちゅ〜る, シーバ メルティ 최신 리뷰에서 소비자 불만·선호 포인트
+
+[출력 형식]
+- "우리 브랜드가 어떻게 성장할 것인가" 관점에서만 분석
+- 경쟁사 세부 활동 나열 금지 → 그것이 우리에게 주는 기회/위협만 도출
+- 소비자 페르소나별 접근법 업데이트
+- 마지막에 "이번 달 브랜드 커뮤니케이션 권고" 3가지</textarea>
+    </div>
+  </div>
+
+  <!-- Agent 3 -->
+  <div class="ag-card">
+    <div class="ag-head">
+      <h3><span class="ag-num" style="background:var(--g)">3</span>Channel & Price Agent</h3>
+      <span class="badge badge-b">매주 수요일</span>
+    </div>
+    <div class="ag-desc">Amazon JP / Rakuten 내 경쟁 가격대, 카테고리 랭킹, 프로모션 동향을 모니터링합니다.<br>우리 상품의 가격·포지셔닝이 적정한지 검증합니다.</div>
+    <div class="ag-meta">
+      <span class="ag-tag">Amazon JP</span><span class="ag-tag">Rakuten</span><span class="ag-tag">가격 동향</span><span class="ag-tag">프로모션</span>
+    </div>
+    <div class="prompt-box">
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <textarea class="prompt-area" readonly>너는 일본 이커머스 플랫폼 분석 전문가다. 아래 작업을 웹서치를 활용하여 수행하라.
+
+[배경]
+- 우리 상품 라인업 (Amazon JP + Rakuten 판매 예정):
+  · 포켓츄 치킨/참치/연어 56g (4p) — 체험팩, 예상 판매가 ¥498
+  · 데일리솔루션 퍼펙트 치킨/연어 150g (15p) — 일상급여, 예상 ¥1,080
+  · Dr.Felis 7+ 케어스틱 치킨/연어 150g (15p) — 시니어 기능성, 예상 ¥1,380
+- 원가 구조: 포켓츄 단품은 적자, 150g 라인이 수익 엔진 (마진 11-16%)
+
+[분석 범위]
+1. Amazon JP "猫おやつ" 카테고리
+   - 베스트셀러 Top 20 중 페이스트/스틱 타입 제품 가격대
+   - 시니어 전용 간식 경쟁 상황
+   - 해외(한국) 브랜드 존재 여부
+2. Rakuten "猫 おやつ" 카테고리
+   - 인기 페이스트/스틱 간식 가격대
+   - 포인트 배율 트렌드
+3. 경쟁사 프로모션 동향
+   - CIAO, シーバ, 銀のスプーン의 세일/쿠폰 동향
+4. 가격 포지셔닝 검증
+   - 우리 예상 가격(¥498/¥1,080/¥1,380)이 시장 내 적정한지 판단
+
+[출력 형식]
+- 경쟁사 가격 비교표 (브랜드, 제품명, 용량, 가격, g당 단가)
+- 우리 가격의 적정성 판단 (높다/적정/낮다 + 근거)
+- 가격 조정 권고 (필요시)
+- 번들 전략 제안 (포켓츄 적자 해결 관점)</textarea>
+    </div>
+  </div>
+
+  <!-- Agent 4 -->
+  <div class="ag-card">
+    <div class="ag-head">
+      <h3><span class="ag-num" style="background:var(--o)">4</span>Brand Position Agent</h3>
+      <span class="badge badge-b">매월 셋째 주</span>
+    </div>
+    <div class="ag-desc">Forcat/Dr.Felis의 일본 시장 내 포지셔닝을 점검하고, 브랜드 성장 기회를 도출합니다.<br>경쟁사 활동이 아닌, "우리 브랜드가 어떻게 성장할 것인가"에 집중합니다.</div>
+    <div class="ag-meta">
+      <span class="ag-tag">포지셔닝</span><span class="ag-tag">차별화</span><span class="ag-tag">성장 기회</span><span class="ag-tag">오프라인 접점</span>
+    </div>
+    <div class="prompt-box">
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <textarea class="prompt-area" readonly>너는 펫 브랜드 전략 컨설턴트다. 아래 작업을 웹서치를 활용하여 수행하라.
+
+[배경]
+- 브랜드: Forcat (메인), Dr.Felis (기능성/전문성)
+- 포지셔닝: "韓国の獣医師が開発した猫おやつ" — 프리미엄 기능성
+- 핵심 차별화: 수의사 개발, 성분 투명성, 시니어 전용(7+)
+- 직접 경쟁 회피 대상: いなば CIAO (가격 경쟁 불가)
+- 간접 경쟁 대상: シーバ メルティ, 銀のスプーン (가격대 유사)
+
+[분석 범위]
+1. 경쟁 환경 변화
+   - 프리미엄 간식 시장 신규 진입자
+   - 해외 브랜드(특히 한국) 일본 진출 동향
+   - いなば/ユニチャーム의 프리미엄 라인 확장 움직임
+2. 오프라인 접점 기회
+   - InterPets 등 펫 전시회 동향
+   - 猫カフェ, 猫の日 등 문화 이벤트
+   - 프리미엄 펫샵 동향
+3. 브랜드 성장 기회
+   - 시니어 고양이 시장 성장 데이터
+   - 기능성 간식 수요 변화
+   - K-Pet 트렌드 기회
+
+[출력 형식]
+- "우리가 움직여야 할 것" 관점에서만 분석
+- 경쟁사의 세세한 활동 나열 금지
+- 포지셔닝 맵 업데이트 (텍스트 기반)
+- 마지막에 "이번 달 브랜드 액션 권고 TOP 3"</textarea>
+    </div>
+  </div>
+
+  <!-- Agent 5 -->
+  <div class="ag-card">
+    <div class="ag-head">
+      <h3><span class="ag-num" style="background:var(--pk)">5</span>Strategic Advisor Agent</h3>
+      <span class="badge badge-b">매주 금 / 매월 말</span>
+    </div>
+    <div class="ag-desc">Agent 1~4의 분석 결과를 종합하여 실행 가능한 전략 권고를 도출합니다.<br>주간에는 짧은 브리핑, 월간에는 전체 전략 보고서를 생성합니다.</div>
+    <div class="ag-meta">
+      <span class="ag-tag">종합 전략</span><span class="ag-tag">실행 권고</span><span class="ag-tag">KPI 리뷰</span><span class="ag-tag">리스크</span>
+    </div>
+    <div class="prompt-box">
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <textarea class="prompt-area" readonly>너는 고양이 용품 제조·수출 기업의 전략 운영 비서 역할을 수행한다.
+이미 관련 업계 및 전략 운영 업무를 30년 수행한 세계 최정상급 전문가이다.
+
+[비즈니스 상황]
+- 브랜드: Forcat, Dr.Felis
+- 일본 시장 진출: Amazon JP + Rakuten
+- 상품: 포켓츄(56g/4p), 데일리솔루션(150g/15p), Dr.Felis 7+ 케어스틱(150g/15p)
+- 대전략: 기존 한국 내수 상품 → 일본 런칭 → 시장 반응 확인 → 필요시 현지화
+- 원가: 포켓츄 단품 적자(-122%), 150g 라인 마진 11-16%
+
+[이번 주 Agent 분석 결과를 아래에 붙여넣으세요]
+---
+(Agent 1 결과 붙여넣기)
+---
+(Agent 3 결과 붙여넣기)
+---
+
+[출력 형식 — 주간 브리핑]
+1. 이번 주 핵심 변화 3가지
+2. 우리가 이번 주 실행해야 할 것 3가지
+3. 주의해야 할 리스크 1가지
+4. 다음 주 Agent 실행 시 추가 확인 사항
+
+답변 원칙:
+- 전문적 비즈니스 톤, 명쾌하고 결단력 있는 보고서 형태
+- 리스크 발견 시 즉시 Flag
+- 표, 불렛포인트 활용 가독성 극대화
+- 경쟁사 세부 활동보다 "우리 브랜드 성장 방향"에 집중</textarea>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== INTELLIGENCE ==================== -->
+<div class="sec" id="sec-intel">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 style="font-size:15px;font-weight:700;">Market Intelligence Log</h2>
+    <button class="hb pr" onclick="addEntry()">+ 인사이트 추가</button>
+  </div>
+
+  <div id="intelLog">
+    <div class="log-entry">
+      <div class="log-date">2026-04-21 | Agent 1 초기 실행</div>
+      <span class="log-cat cat-market">시장</span>
+      <div class="log-body">일본 펫푸드 시장 5,122억엔 (2026 전망), 간식 CAGR 5.86% (2025-2031). 고양이 간식이 가장 빠르게 성장하는 세그먼트.</div>
+      <div class="log-action">→ 시사점: 간식 카테고리 진입 타이밍 적절. 성장 시장에 올라타는 전략 유효.</div>
+    </div>
+    <div class="log-entry">
+      <div class="log-date">2026-04-21 | Agent 1 초기 실행</div>
+      <span class="log-cat cat-comp">경쟁</span>
+      <div class="log-body">시니어(7+) 전용 기능성 스틱 간식 = いなば도 시니어용 출시했으나 기능성 깊이 얕음. 대형 브랜드가 장악하지 못한 성장 세그먼트.</div>
+      <div class="log-action">→ 시사점: Dr.Felis 7+ 케어스틱이 이 빈 공간을 차지할 수 있음. 최대 차별화 포인트.</div>
+    </div>
+    <div class="log-entry">
+      <div class="log-date">2026-04-21 | Agent 2 초기 실행</div>
+      <span class="log-cat cat-consumer">소비자</span>
+      <div class="log-body">K-Beauty 일본 수입 비중 약 30%. "브랜드보다 성분", "광고보다 리뷰"로 구매 결정. K-Beauty 소비자 = 고양이 보호자 핵심층 (25-35세 여성) 동일.</div>
+      <div class="log-action">→ 시사점: K-Beauty → K-Pet 전이 가능성 4/5. 성분 투명성이 핵심 커뮤니케이션.</div>
+    </div>
+    <div class="log-entry">
+      <div class="log-date">2026-04-21 | Agent 2 초기 실행</div>
+      <span class="log-cat cat-consumer">소비자</span>
+      <div class="log-body">일본 소비자 61.3%가 "비싸도 국산 선택". 그러나 오리젠(캐나다), 로얄캐닌(프랑스) 등 해외 프리미엄 성공 사례 존재.</div>
+      <div class="log-action">→ 시사점: "国産"과 싸우지 말고 "韓国の獣医師が開発" = 프리미엄 프레이밍으로 전환.</div>
+    </div>
+    <div class="log-entry">
+      <div class="log-date">2026-04-21 | Agent 3 초기 실행</div>
+      <span class="log-cat cat-channel">채널</span>
+      <div class="log-body">CIAO ちゅ〜る 4本(56g) ¥200-300 vs 포켓츄 예상 ¥498. シーバ メルティ 4本(48g) ¥300-400.</div>
+      <div class="log-action">→ 시사점: 포켓츄는 シーバ 상위 가격대. 가격 정당화를 위해 "수의사 개발" 스토리 필수.</div>
+    </div>
+    <div class="log-entry">
+      <div class="log-date">2026-04-21 | 원가 분석</div>
+      <span class="log-cat cat-brand">원가</span>
+      <div class="log-body">포켓츄 56g DDP ₩1,808~1,895 → 단품 판매 시 마진 -122%. 데일리솔루션 150g 마진 13.9~15.6%, Dr.Felis 7+ 마진 11.3~13.4%.</div>
+      <div class="log-action">→ 시사점: 포켓츄 단품 판매 불가. 번들(2개입+) 또는 150g 라인 우선 런칭 필수. 150g이 수익 엔진.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== SKU ==================== -->
+<div class="sec" id="sec-sku">
+
+  <h2 style="font-size:15px;font-weight:700;margin-bottom:16px;">SKU & Cost Structure</h2>
+
+  <div class="cd fw" style="overflow-x:auto;">
+    <h3><span class="dot" style="background:var(--bl)"></span>7개 SKU 원가·마진 분석</h3>
+    <table class="sku-tbl">
+      <tr>
+        <th>품목코드</th><th>상품명</th><th>용량</th><th>EXW (KRW)</th><th>DDP (KRW)</th>
+        <th>예상 판매가 (¥)</th><th>마진율</th><th>상태</th><th>전략적 역할</th>
+      </tr>
+      <tr>
+        <td>DR10042</td><td>포켓츄 치킨</td><td>56g (4p)</td>
+        <td class="num">1,097</td><td class="num">1,895</td><td class="num">498</td>
+        <td class="num neg">-122%</td><td><span class="badge badge-r">단품 적자</span></td>
+        <td>체험 유도 (번들 필수)</td>
+      </tr>
+      <tr>
+        <td>DR10043</td><td>포켓츄 참치</td><td>56g (4p)</td>
+        <td class="num">1,010</td><td class="num">1,808</td><td class="num">498</td>
+        <td class="num neg">-119%</td><td><span class="badge badge-r">단품 적자</span></td>
+        <td>맛 바리에이션</td>
+      </tr>
+      <tr>
+        <td>DR10044</td><td>포켓츄 연어</td><td>56g (4p)</td>
+        <td class="num">1,032</td><td class="num">1,830</td><td class="num">498</td>
+        <td class="num neg">-120%</td><td><span class="badge badge-r">단품 적자</span></td>
+        <td>맛 바리에이션</td>
+      </tr>
+      <tr style="background:var(--s2)">
+        <td>DR10063</td><td><strong>데일리솔루션 치킨</strong></td><td>150g (15p)</td>
+        <td class="num">3,229</td><td class="num">4,027</td><td class="num">1,080</td>
+        <td class="num pos">15.6%</td><td><span class="badge badge-g">수익</span></td>
+        <td>일상 급여, 재구매 엔진</td>
+      </tr>
+      <tr style="background:var(--s2)">
+        <td>DR10064</td><td><strong>데일리솔루션 연어</strong></td><td>150g (15p)</td>
+        <td class="num">3,433</td><td class="num">4,232</td><td class="num">1,080</td>
+        <td class="num pos">13.9%</td><td><span class="badge badge-g">수익</span></td>
+        <td>맛 바리에이션</td>
+      </tr>
+      <tr style="background:var(--s2)">
+        <td>DR10067</td><td><strong style="color:var(--ac)">Dr.Felis 7+ 치킨</strong></td><td>150g (15p)</td>
+        <td class="num">3,493</td><td class="num">4,291</td><td class="num">1,380</td>
+        <td class="num pos">13.4%</td><td><span class="badge badge-g">수익</span></td>
+        <td style="color:var(--ac);font-weight:600">최대 차별화 상품</td>
+      </tr>
+      <tr style="background:var(--s2)">
+        <td>DR10068</td><td><strong style="color:var(--ac)">Dr.Felis 7+ 연어</strong></td><td>150g (15p)</td>
+        <td class="num">3,751</td><td class="num">4,550</td><td class="num">1,380</td>
+        <td class="num pos">11.3%</td><td><span class="badge badge-o">주의</span></td>
+        <td>맛 바리에이션</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="cg" style="margin-top:16px;">
+    <div class="cd">
+      <h3><span class="dot" style="background:var(--r)"></span>포켓츄 적자 해결 옵션</h3>
+      <table class="dt">
+        <tr><th>옵션</th><th>설명</th><th>판단</th></tr>
+        <tr><td>A. 번들 2개입</td><td>2개 묶어 ¥880~950 판매</td><td>마진 개선 가능</td></tr>
+        <tr><td>B. 번들 3개입</td><td>3맛 세트 ¥1,380 판매</td><td>체험팩으로 최적</td></tr>
+        <tr><td>C. 1차 제외</td><td>150g 라인만 먼저 런칭</td><td>리스크 최소화</td></tr>
+        <tr><td>D. 판매가 인상</td><td>¥498 → ¥680~780</td><td>경쟁력 저하 우려</td></tr>
+      </table>
+    </div>
+    <div class="cd">
+      <h3><span class="dot" style="background:var(--g)"></span>수익 구조 요약</h3>
+      <table class="dt">
+        <tr><th>라인</th><th>역할</th><th>수익성</th></tr>
+        <tr><td style="color:var(--r)">포켓츄 56g</td><td>체험·유입</td><td class="neg">적자 (번들 필수)</td></tr>
+        <tr><td style="color:var(--g)">데일리솔루션 150g</td><td>일상·재구매</td><td class="pos">마진 14-16%</td></tr>
+        <tr><td style="color:var(--ac)">Dr.Felis 7+ 150g</td><td>프리미엄·차별화</td><td class="pos">마진 11-13%</td></tr>
+      </table>
+      <p style="color:var(--t2);font-size:11px;margin-top:10px;">
+        → 150g 라인이 수익 엔진. 포켓츄는 유입용 번들 or 1차 제외 검토.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== HOW TO ==================== -->
+<div class="sec" id="sec-howto">
+
+  <h2 style="font-size:15px;font-weight:700;margin-bottom:20px;">사용 가이드</h2>
+
+  <div class="cd fw" style="margin-bottom:20px;">
+    <h3><span class="dot" style="background:var(--ac)"></span>이 시스템은 무엇인가</h3>
+    <p style="color:var(--t2);line-height:1.8;">
+      이 HTML은 <strong style="color:var(--t)">일본 시장 인텔리전스를 반복적으로 수집·분석·축적하는 AI Agent 시스템</strong>입니다.<br>
+      5개의 전문 Agent 프롬프트를 Claude Max에 복사-붙여넣기하면 최신 시장 분석이 실행됩니다.<br>
+      분석 결과는 이 대시보드의 Intelligence 탭에 축적하여 시간 경과에 따른 변화를 추적합니다.<br><br>
+      <strong style="color:var(--ac)">핵심 원칙:</strong> 경쟁사의 세세한 활동이 아닌, <strong style="color:var(--t)">"우리 브랜드가 어떻게 성장할 것인가"</strong>에 집중합니다.
+    </p>
+  </div>
+
+  <div class="how-step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h4>Agent Prompts 탭에서 프롬프트 복사</h4>
+      <p>실행할 Agent의 "Copy" 버튼을 클릭하여 프롬프트를 복사합니다.<br>
+      주간 루틴: 월(Agent 1) → 수(Agent 3) → 금(Agent 5)</p>
+    </div>
+  </div>
+  <div class="how-step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h4>Claude Max에 붙여넣기 → 실행</h4>
+      <p>Claude Max (claude.ai) 새 대화에 프롬프트를 붙여넣고 실행합니다.<br>
+      Claude가 웹서치를 활용하여 최신 시장 데이터를 수집·분석합니다.</p>
+    </div>
+  </div>
+  <div class="how-step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h4>핵심 인사이트를 Intelligence 탭에 기록</h4>
+      <p>분석 결과 중 "우리 브랜드에 의미있는 것"만 Intelligence 탭에 추가합니다.<br>
+      "+ 인사이트 추가" 버튼으로 날짜·카테고리·내용·시사점을 기록합니다.</p>
+    </div>
+  </div>
+  <div class="how-step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h4>Agent 5로 주간/월간 전략 브리핑 생성</h4>
+      <p>Agent 1~4의 분석 결과를 Agent 5 프롬프트에 붙여넣으면<br>
+      종합 전략 브리핑이 생성됩니다. 이것이 의사결정 지원 자료입니다.</p>
+    </div>
+  </div>
+  <div class="how-step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <h4>프롬프트는 자유롭게 수정 가능</h4>
+      <p>시장 상황이 변하거나, 새로운 분석이 필요하면 프롬프트를 직접 수정하세요.<br>
+      예: 새로운 경쟁사 등장 시 Agent 3에 해당 브랜드 추가, 신규 채널 검토 시 Agent 3 확장.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Tab switching
+function showTab(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('sec-'+id).classList.add('on');
+  event.target.classList.add('on');
+}
+
+// Copy prompt
+function copyPrompt(btn){
+  const ta=btn.parentElement.querySelector('.prompt-area');
+  navigator.clipboard.writeText(ta.value).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1500);
+  });
+}
+
+// Add intelligence entry
+function addEntry(){
+  const cats=['market','comp','consumer','channel','brand'];
+  const catNames=['시장','경쟁','소비자','채널','브랜드'];
+  const catClasses=['cat-market','cat-comp','cat-consumer','cat-channel','cat-brand'];
+
+  const catIdx=prompt('카테고리 선택 (1:시장 2:경쟁 3:소비자 4:채널 5:브랜드):');
+  if(!catIdx||catIdx<1||catIdx>5)return;
+  const body=prompt('인사이트 내용:');
+  if(!body)return;
+  const action=prompt('시사점 (우리 브랜드 대응):');
+  if(!action)return;
+
+  const today=new Date().toISOString().slice(0,10);
+  const idx=parseInt(catIdx)-1;
+
+  const html=`<div class="log-entry">
+    <div class="log-date">${today} | 수동 입력</div>
+    <span class="log-cat ${catClasses[idx]}">${catNames[idx]}</span>
+    <div class="log-body">${body}</div>
+    <div class="log-action">→ 시사점: ${action}</div>
+  </div>`;
+
+  document.getElementById('intelLog').insertAdjacentHTML('afterbegin',html);
+
+  // Update count
+  const count=document.querySelectorAll('.log-entry').length;
+  document.getElementById('intelCount').textContent=count;
+
+  // Save to localStorage
+  saveIntel();
+}
+
+// Save/Load intelligence to localStorage
+function saveIntel(){
+  localStorage.setItem('jp_intel',document.getElementById('intelLog').innerHTML);
+  localStorage.setItem('jp_intel_date',new Date().toISOString().slice(0,10));
+}
+function loadIntel(){
+  const saved=localStorage.getItem('jp_intel');
+  if(saved){
+    document.getElementById('intelLog').innerHTML=saved;
+    const count=document.querySelectorAll('.log-entry').length;
+    document.getElementById('intelCount').textContent=count;
+  }
+  const lastDate=localStorage.getItem('jp_intel_date');
+  if(lastDate)document.getElementById('lastRun').textContent=lastDate;
+}
+
+// Export data as JSON
+function exportData(){
+  const entries=[];
+  document.querySelectorAll('.log-entry').forEach(e=>{
+    entries.push({
+      date:e.querySelector('.log-date')?.textContent||'',
+      category:e.querySelector('.log-cat')?.textContent||'',
+      body:e.querySelector('.log-body')?.textContent||'',
+      action:e.querySelector('.log-action')?.textContent||''
+    });
+  });
+  const blob=new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='jp_market_intelligence_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+
+// Init
+loadIntel();
+</script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Hub | Forcat · Felis · Dr.Felis</title>
+<style>
+:root {
+  --bg: #0c0e14;
+  --s: #141620;
+  --s2: #1c1f2e;
+  --s3: #252840;
+  --bd: #2a2e42;
+  --t: #e2e4ef;
+  --t2: #8b90a8;
+  --t3: #5a5f78;
+  --ac: #6c7cff;
+  --ac2: #4e5bdb;
+  --g: #34d399;
+  --o: #fbbf24;
+  --bl: #60a5fa;
+  --pu: #a78bfa;
+  --pk: #f472b6;
+  --cy: #22d3ee;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', sans-serif;
+  background: var(--bg);
+  color: var(--t);
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background: var(--s);
+  border-bottom: 1px solid var(--bd);
+  padding: 24px 40px;
+  text-align: center;
+}
+.header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.header h1 span { color: var(--ac); }
+.header p {
+  color: var(--t2);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* Search */
+.search-bar {
+  max-width: 900px;
+  margin: 24px auto 0;
+  padding: 0 40px;
+}
+.search-bar input {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 13px;
+  border-radius: 8px;
+  border: 1px solid var(--bd);
+  background: var(--s2);
+  color: var(--t);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-bar input:focus { border-color: var(--ac); }
+.search-bar input::placeholder { color: var(--t3); }
+
+/* Category Filter */
+.filters {
+  max-width: 900px;
+  margin: 16px auto 0;
+  padding: 0 40px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.filter-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--bd);
+  background: var(--s2);
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-btn:hover { border-color: var(--ac); color: var(--t); }
+.filter-btn.active { background: var(--ac); border-color: var(--ac); color: #fff; }
+
+/* Grid */
+.grid {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 0 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Card */
+.card {
+  background: var(--s);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 12px 12px 0 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.card:hover {
+  border-color: var(--ac);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.card:hover::before { opacity: 1; }
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.card-desc {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--bd);
+}
+.card-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.card-version {
+  font-size: 10px;
+  color: var(--t3);
+  margin-left: auto;
+}
+
+/* Category colors */
+.cat-market .card-icon { background: rgba(108,124,255,0.15); }
+.cat-market::before { background: var(--ac); }
+.cat-market .card-tag { background: rgba(108,124,255,0.15); color: var(--ac); }
+
+.cat-finance .card-icon { background: rgba(52,211,153,0.15); }
+.cat-finance::before { background: var(--g); }
+.cat-finance .card-tag { background: rgba(52,211,153,0.15); color: var(--g); }
+
+.cat-product .card-icon { background: rgba(244,114,182,0.15); }
+.cat-product::before { background: var(--pk); }
+.cat-product .card-tag { background: rgba(244,114,182,0.15); color: var(--pk); }
+
+.cat-other .card-icon { background: rgba(251,191,36,0.15); }
+.cat-other::before { background: var(--o); }
+.cat-other .card-tag { background: rgba(251,191,36,0.15); color: var(--o); }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--t3);
+  font-size: 13px;
+  grid-column: 1 / -1;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--t3);
+  font-size: 11px;
+  border-top: 1px solid var(--bd);
+  margin-top: 40px;
+}
+
+/* Hidden utility */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>Team Hub</span> | Forcat · Felis · Dr.Felis</h1>
+  <p>Claude Code로 생성한 팀 도구 모음</p>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="도구 검색..." autocomplete="off">
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" data-cat="all">전체</button>
+  <button class="filter-btn" data-cat="market">시장분석</button>
+  <button class="filter-btn" data-cat="finance">손익/재무</button>
+  <button class="filter-btn" data-cat="product">제품</button>
+</div>
+
+<div class="grid" id="grid">
+
+  <a class="card cat-market" href="JP_Market_Agent_System_v2.html" data-cat="market" data-title="Japan Market Intelligence Agent v2" data-desc="일본 시장 경쟁사 분석 에이전트 시스템">
+    <div class="card-icon">🔍</div>
+    <div class="card-title">Japan Market Intelligence Agent</div>
+    <div class="card-desc">일본 시장 경쟁사 분석 에이전트 시스템 (최신)</div>
+    <div class="card-meta">
+      <span class="card-tag">시장분석</span>
+      <span class="card-version">v2</span>
+    </div>
+  </a>
+
+  <a class="card cat-market" href="JP_Market_Agent_System_v1.html" data-cat="market" data-title="Japan Market Intelligence Agent v1" data-desc="일본 시장 경쟁사 분석 에이전트 시스템 초기 버전">
+    <div class="card-icon">🔍</div>
+    <div class="card-title">Japan Market Intelligence Agent</div>
+    <div class="card-desc">일본 시장 경쟁사 분석 에이전트 시스템 (초기)</div>
+    <div class="card-meta">
+      <span class="card-tag">시장분석</span>
+      <span class="card-version">v1</span>
+    </div>
+  </a>
+
+  <a class="card cat-finance" href="해외사업_손익분석_v4.html" data-cat="finance" data-title="해외사업 손익분석 v4" data-desc="해외사업부 손익분석 대시보드 최신 버전">
+    <div class="card-icon">📊</div>
+    <div class="card-title">해외사업 손익분석</div>
+    <div class="card-desc">해외사업부 손익분석 대시보드 (최신)</div>
+    <div class="card-meta">
+      <span class="card-tag">손익/재무</span>
+      <span class="card-version">v4</span>
+    </div>
+  </a>
+
+  <a class="card cat-finance" href="해외사업_손익분석_대시보드_v3.html" data-cat="finance" data-title="해외사업 손익분석 마스터 v3" data-desc="해외사업부 손익분석 대시보드">
+    <div class="card-icon">📊</div>
+    <div class="card-title">해외사업 손익분석 마스터</div>
+    <div class="card-desc">해외사업부 손익분석 대시보드</div>
+    <div class="card-meta">
+      <span class="card-tag">손익/재무</span>
+      <span class="card-version">v3</span>
+    </div>
+  </a>
+
+  <a class="card cat-finance" href="해외사업_손익분석_대시보드_v2.html" data-cat="finance" data-title="해외사업 손익분석 마스터 v2" data-desc="해외사업부 손익분석 대시보드">
+    <div class="card-icon">📊</div>
+    <div class="card-title">해외사업 손익분석 마스터</div>
+    <div class="card-desc">해외사업부 손익분석 대시보드</div>
+    <div class="card-meta">
+      <span class="card-tag">손익/재무</span>
+      <span class="card-version">v2</span>
+    </div>
+  </a>
+
+  <a class="card cat-finance" href="해외사업_손익분석_대시보드.html" data-cat="finance" data-title="해외사업 손익분석 대시보드 v1" data-desc="해외사업부 손익분석 대시보드 초기 버전">
+    <div class="card-icon">📊</div>
+    <div class="card-title">해외사업 손익분석 대시보드</div>
+    <div class="card-desc">해외사업부 손익분석 대시보드 (초기)</div>
+    <div class="card-meta">
+      <span class="card-tag">손익/재무</span>
+      <span class="card-version">v1</span>
+    </div>
+  </a>
+
+  <a class="card cat-product" href="drfelis-perfect-care.html" data-cat="product" data-title="Perfect Care Stick — Dr.Felis" data-desc="Dr.Felis 퍼펙트 케어 스틱 제품 페이지">
+    <div class="card-icon">🐱</div>
+    <div class="card-title">Perfect Care Stick — Dr.Felis</div>
+    <div class="card-desc">Dr.Felis 퍼펙트 케어 스틱 제품 페이지</div>
+    <div class="card-meta">
+      <span class="card-tag">제품</span>
+      <span class="card-version">v1</span>
+    </div>
+  </a>
+
+</div>
+
+<div class="footer">
+  Forcat · Felis · Dr.Felis — Claude Code Team Hub
+</div>
+
+<script>
+// Search
+const search = document.getElementById('search');
+const grid = document.getElementById('grid');
+const cards = grid.querySelectorAll('.card');
+const filterBtns = document.querySelectorAll('.filter-btn');
+let activeCat = 'all';
+
+function filterCards() {
+  const q = search.value.toLowerCase().trim();
+  let visible = 0;
+  cards.forEach(c => {
+    const matchCat = activeCat === 'all' || c.dataset.cat === activeCat;
+    const matchSearch = !q ||
+      c.dataset.title.toLowerCase().includes(q) ||
+      c.dataset.desc.toLowerCase().includes(q);
+    const show = matchCat && matchSearch;
+    c.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+  // empty state
+  let empty = grid.querySelector('.empty');
+  if (visible === 0) {
+    if (!empty) {
+      empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = '검색 결과가 없습니다';
+      grid.appendChild(empty);
+    }
+  } else if (empty) {
+    empty.remove();
+  }
+}
+
+search.addEventListener('input', filterCards);
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    filterCards();
+  });
+});
+</script>
+</body>
+</html>
