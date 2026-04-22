@@ -6,356 +6,625 @@
 <title>Team Hub | Forcat · Felis · Dr.Felis</title>
 <style>
 :root {
-  --bg: #0c0e14;
-  --s: #141620;
-  --s2: #1c1f2e;
-  --s3: #252840;
-  --bd: #2a2e42;
-  --t: #e2e4ef;
-  --t2: #8b90a8;
-  --t3: #5a5f78;
-  --ac: #6c7cff;
-  --ac2: #4e5bdb;
-  --g: #34d399;
-  --o: #fbbf24;
-  --bl: #60a5fa;
-  --pu: #a78bfa;
-  --pk: #f472b6;
-  --cy: #22d3ee;
+  --bg: #0c0e14; --s: #141620; --s2: #1c1f2e; --s3: #252840;
+  --bd: #2a2e42; --t: #e2e4ef; --t2: #8b90a8; --t3: #5a5f78;
+  --ac: #6c7cff; --ac2: #4e5bdb; --g: #34d399; --r: #f87171;
+  --o: #fbbf24; --bl: #60a5fa; --pu: #a78bfa; --pk: #f472b6; --cy: #22d3ee;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', sans-serif;
-  background: var(--bg);
-  color: var(--t);
-  min-height: 100vh;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Pretendard',sans-serif; background:var(--bg); color:var(--t); min-height:100vh; }
 
 /* Header */
-.header {
-  background: var(--s);
-  border-bottom: 1px solid var(--bd);
-  padding: 24px 40px;
-  text-align: center;
-}
-.header h1 {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-.header h1 span { color: var(--ac); }
-.header p {
-  color: var(--t2);
-  font-size: 13px;
-  margin-top: 6px;
-}
+.header { background:var(--s); border-bottom:1px solid var(--bd); padding:20px 40px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.header-left h1 { font-size:20px; font-weight:700; }
+.header-left h1 span { color:var(--ac); }
+.header-left p { color:var(--t2); font-size:12px; margin-top:4px; }
+.header-right { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.hbtn { padding:7px 14px; border-radius:6px; border:1px solid var(--bd); background:var(--s2); color:var(--t2); font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:5px; white-space:nowrap; }
+.hbtn:hover { border-color:var(--ac); color:var(--t); }
+.hbtn.primary { background:var(--ac); border-color:var(--ac); color:#fff; }
+.hbtn.primary:hover { background:var(--ac2); }
+.status-dot { width:8px; height:8px; border-radius:50%; }
+.status-dot.on { background:var(--g); }
+.status-dot.off { background:var(--r); }
 
-/* Search */
-.search-bar {
-  max-width: 900px;
-  margin: 24px auto 0;
-  padding: 0 40px;
-}
-.search-bar input {
-  width: 100%;
-  padding: 10px 16px;
-  font-size: 13px;
-  border-radius: 8px;
-  border: 1px solid var(--bd);
-  background: var(--s2);
-  color: var(--t);
-  outline: none;
-  transition: border-color 0.2s;
-}
-.search-bar input:focus { border-color: var(--ac); }
-.search-bar input::placeholder { color: var(--t3); }
-
-/* Category Filter */
-.filters {
-  max-width: 900px;
-  margin: 16px auto 0;
-  padding: 0 40px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.filter-btn {
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--bd);
-  background: var(--s2);
-  color: var(--t2);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.filter-btn:hover { border-color: var(--ac); color: var(--t); }
-.filter-btn.active { background: var(--ac); border-color: var(--ac); color: #fff; }
+/* Toolbar */
+.toolbar { max-width:1100px; margin:20px auto 0; padding:0 40px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.search-input { flex:1; min-width:200px; padding:9px 14px; font-size:13px; border-radius:8px; border:1px solid var(--bd); background:var(--s2); color:var(--t); outline:none; transition:border-color .2s; }
+.search-input:focus { border-color:var(--ac); }
+.search-input::placeholder { color:var(--t3); }
+.filter-btn { padding:6px 14px; border-radius:6px; border:1px solid var(--bd); background:var(--s2); color:var(--t2); font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; }
+.filter-btn:hover { border-color:var(--ac); color:var(--t); }
+.filter-btn.active { background:var(--ac); border-color:var(--ac); color:#fff; }
+.edit-indicator { margin-left:auto; font-size:11px; color:var(--o); display:none; align-items:center; gap:4px; }
+.edit-indicator.show { display:flex; }
 
 /* Grid */
-.grid {
-  max-width: 900px;
-  margin: 24px auto;
-  padding: 0 40px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-}
+.grid { max-width:1100px; margin:20px auto; padding:0 40px; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
 
 /* Card */
-.card {
-  background: var(--s);
-  border: 1px solid var(--bd);
-  border-radius: 12px;
-  padding: 24px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  text-decoration: none;
-  color: inherit;
-  position: relative;
-  overflow: hidden;
-}
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  border-radius: 12px 12px 0 0;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.card:hover {
-  border-color: var(--ac);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
-.card:hover::before { opacity: 1; }
+.card { background:var(--s); border:1px solid var(--bd); border-radius:12px; padding:20px; cursor:pointer; transition:all .2s; display:flex; flex-direction:column; gap:10px; text-decoration:none; color:inherit; position:relative; overflow:hidden; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:12px 12px 0 0; opacity:0; transition:opacity .2s; }
+.card:hover { border-color:var(--ac); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.3); }
+.card:hover::before { opacity:1; }
+.card.dragging { opacity:.4; transform:scale(.95); }
+.card.drag-over { border-color:var(--o); box-shadow:0 0 0 2px var(--o); }
 
-.card-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
+.card-top { display:flex; align-items:flex-start; justify-content:space-between; }
+.card-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.card-actions { display:none; gap:4px; }
+.edit-mode .card-actions { display:flex; }
+.card-actions button { width:26px; height:26px; border-radius:6px; border:1px solid var(--bd); background:var(--s2); color:var(--t3); cursor:pointer; font-size:12px; transition:all .15s; display:flex; align-items:center; justify-content:center; }
+.card-actions button:hover { border-color:var(--ac); color:var(--t); }
+.card-actions .del-btn:hover { border-color:var(--r); color:var(--r); background:rgba(248,113,113,.1); }
+.card-title { font-size:14px; font-weight:600; line-height:1.4; }
+.card-desc { font-size:12px; color:var(--t2); line-height:1.5; }
+.card-meta { display:flex; align-items:center; gap:8px; margin-top:auto; padding-top:8px; border-top:1px solid var(--bd); }
+.card-tag { font-size:10px; padding:2px 8px; border-radius:4px; font-weight:500; }
+.card-author { font-size:10px; color:var(--t3); }
+.card-version { font-size:10px; color:var(--t3); margin-left:auto; }
 
-.card-title {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-.card-desc {
-  font-size: 12px;
-  color: var(--t2);
-  line-height: 1.5;
-}
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 8px;
-  border-top: 1px solid var(--bd);
-}
-.card-tag {
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-.card-version {
-  font-size: 10px;
-  color: var(--t3);
-  margin-left: auto;
-}
+.edit-mode .card { cursor:grab; }
+.edit-mode .card:active { cursor:grabbing; }
 
 /* Category colors */
-.cat-market .card-icon { background: rgba(108,124,255,0.15); }
-.cat-market::before { background: var(--ac); }
-.cat-market .card-tag { background: rgba(108,124,255,0.15); color: var(--ac); }
+.cat-market .card-icon { background:rgba(108,124,255,.15); }
+.cat-market::before { background:var(--ac); }
+.cat-market .card-tag { background:rgba(108,124,255,.15); color:var(--ac); }
+.cat-finance .card-icon { background:rgba(52,211,153,.15); }
+.cat-finance::before { background:var(--g); }
+.cat-finance .card-tag { background:rgba(52,211,153,.15); color:var(--g); }
+.cat-product .card-icon { background:rgba(244,114,182,.15); }
+.cat-product::before { background:var(--pk); }
+.cat-product .card-tag { background:rgba(244,114,182,.15); color:var(--pk); }
+.cat-other .card-icon { background:rgba(251,191,36,.15); }
+.cat-other::before { background:var(--o); }
+.cat-other .card-tag { background:rgba(251,191,36,.15); color:var(--o); }
 
-.cat-finance .card-icon { background: rgba(52,211,153,0.15); }
-.cat-finance::before { background: var(--g); }
-.cat-finance .card-tag { background: rgba(52,211,153,0.15); color: var(--g); }
+/* Empty */
+.empty { text-align:center; padding:60px 20px; color:var(--t3); font-size:13px; grid-column:1/-1; }
 
-.cat-product .card-icon { background: rgba(244,114,182,0.15); }
-.cat-product::before { background: var(--pk); }
-.cat-product .card-tag { background: rgba(244,114,182,0.15); color: var(--pk); }
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; align-items:center; justify-content:center; }
+.modal-overlay.show { display:flex; }
+.modal { background:var(--s); border:1px solid var(--bd); border-radius:14px; width:90%; max-width:500px; padding:28px; max-height:90vh; overflow-y:auto; }
+.modal h2 { font-size:16px; margin-bottom:20px; }
+.form-group { margin-bottom:14px; }
+.form-group label { display:block; font-size:12px; color:var(--t2); margin-bottom:5px; font-weight:500; }
+.form-group input, .form-group select, .form-group textarea { width:100%; padding:9px 12px; font-size:13px; border-radius:8px; border:1px solid var(--bd); background:var(--s2); color:var(--t); outline:none; font-family:inherit; }
+.form-group input:focus, .form-group select:focus { border-color:var(--ac); }
+.form-group select { cursor:pointer; }
+.form-row { display:flex; gap:10px; }
+.form-row .form-group { flex:1; }
+.file-drop { border:2px dashed var(--bd); border-radius:10px; padding:30px; text-align:center; color:var(--t3); font-size:12px; transition:all .2s; cursor:pointer; }
+.file-drop:hover, .file-drop.drag-active { border-color:var(--ac); color:var(--t2); background:rgba(108,124,255,.05); }
+.file-drop.has-file { border-color:var(--g); color:var(--g); }
+.file-drop input { display:none; }
+.modal-btns { display:flex; gap:8px; justify-content:flex-end; margin-top:20px; }
 
-.cat-other .card-icon { background: rgba(251,191,36,0.15); }
-.cat-other::before { background: var(--o); }
-.cat-other .card-tag { background: rgba(251,191,36,0.15); color: var(--o); }
+/* Token */
+.token-info { font-size:12px; color:var(--t2); line-height:1.7; margin-bottom:16px; }
+.token-info a { color:var(--bl); }
+.token-info code { background:var(--s2); padding:2px 6px; border-radius:4px; font-size:11px; }
+.disconnect-row { display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:1px solid var(--bd); }
+.disconnect-row span { font-size:12px; color:var(--g); }
 
-/* Empty state */
-.empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--t3);
-  font-size: 13px;
-  grid-column: 1 / -1;
-}
+/* Toast */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--s); border:1px solid var(--bd); border-radius:10px; padding:12px 20px; font-size:13px; z-index:200; transform:translateY(100px); opacity:0; transition:all .3s; }
+.toast.show { transform:translateY(0); opacity:1; }
+.toast.success { border-color:var(--g); }
+.toast.error { border-color:var(--r); }
 
 /* Footer */
-.footer {
-  text-align: center;
-  padding: 24px;
-  color: var(--t3);
-  font-size: 11px;
-  border-top: 1px solid var(--bd);
-  margin-top: 40px;
-}
-
-/* Hidden utility */
-.hidden { display: none !important; }
+.footer { text-align:center; padding:24px; color:var(--t3); font-size:11px; border-top:1px solid var(--bd); margin-top:40px; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1><span>Team Hub</span> | Forcat · Felis · Dr.Felis</h1>
-  <p>Claude Code로 생성한 팀 도구 모음</p>
+  <div class="header-left">
+    <h1><span>Team Hub</span> | Forcat · Felis · Dr.Felis</h1>
+    <p>Claude Code로 생성한 팀 도구 모음</p>
+  </div>
+  <div class="header-right">
+    <button class="hbtn" id="btnConnect" onclick="showTokenModal()">
+      <div class="status-dot off" id="statusDot"></div>
+      <span id="connectLabel">연결</span>
+    </button>
+    <button class="hbtn" id="btnEdit" onclick="toggleEditMode()" style="display:none">편집 모드</button>
+    <button class="hbtn primary" id="btnAdd" onclick="showAddModal()" style="display:none">+ 추가</button>
+    <button class="hbtn primary" id="btnSave" onclick="saveChanges()" style="display:none">저장</button>
+    <button class="hbtn" id="btnCancel" onclick="cancelEdit()" style="display:none">취소</button>
+  </div>
 </div>
 
-<div class="search-bar">
-  <input type="text" id="search" placeholder="도구 검색..." autocomplete="off">
-</div>
-
-<div class="filters">
+<div class="toolbar">
+  <input type="text" class="search-input" id="search" placeholder="도구 검색..." autocomplete="off">
   <button class="filter-btn active" data-cat="all">전체</button>
   <button class="filter-btn" data-cat="market">시장분석</button>
   <button class="filter-btn" data-cat="finance">손익/재무</button>
   <button class="filter-btn" data-cat="product">제품</button>
+  <button class="filter-btn" data-cat="other">기타</button>
+  <div class="edit-indicator" id="editIndicator">드래그하여 순서 변경 · ✕ 버튼으로 삭제</div>
 </div>
 
-<div class="grid" id="grid">
+<div class="grid" id="grid"></div>
 
-  <a class="card cat-market" href="JP_Market_Agent_System_v2.html" data-cat="market" data-title="Japan Market Intelligence Agent v2" data-desc="일본 시장 경쟁사 분석 에이전트 시스템">
-    <div class="card-icon">🔍</div>
-    <div class="card-title">Japan Market Intelligence Agent</div>
-    <div class="card-desc">일본 시장 경쟁사 분석 에이전트 시스템 (최신)</div>
-    <div class="card-meta">
-      <span class="card-tag">시장분석</span>
-      <span class="card-version">v2</span>
+<div class="footer">Forcat · Felis · Dr.Felis — Claude Code Team Hub</div>
+
+<!-- Token Modal -->
+<div class="modal-overlay" id="tokenModal">
+  <div class="modal">
+    <h2>GitHub 연결</h2>
+    <div class="token-info">
+      카드 추가/삭제/순서변경을 하려면 GitHub Personal Access Token이 필요합니다.<br><br>
+      1. <a href="https://github.com/settings/tokens/new?scopes=repo&description=Team+Hub" target="_blank">GitHub Token 생성 페이지</a> 열기<br>
+      2. <code>repo</code> 권한 체크 후 토큰 생성<br>
+      3. 아래에 붙여넣기 (브라우저 로컬에만 저장됨)
     </div>
-  </a>
-
-  <a class="card cat-market" href="JP_Market_Agent_System_v1.html" data-cat="market" data-title="Japan Market Intelligence Agent v1" data-desc="일본 시장 경쟁사 분석 에이전트 시스템 초기 버전">
-    <div class="card-icon">🔍</div>
-    <div class="card-title">Japan Market Intelligence Agent</div>
-    <div class="card-desc">일본 시장 경쟁사 분석 에이전트 시스템 (초기)</div>
-    <div class="card-meta">
-      <span class="card-tag">시장분석</span>
-      <span class="card-version">v1</span>
+    <div class="form-group">
+      <label>Personal Access Token</label>
+      <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
     </div>
-  </a>
-
-  <a class="card cat-finance" href="해외사업_손익분석_v4.html" data-cat="finance" data-title="해외사업 손익분석 v4" data-desc="해외사업부 손익분석 대시보드 최신 버전">
-    <div class="card-icon">📊</div>
-    <div class="card-title">해외사업 손익분석</div>
-    <div class="card-desc">해외사업부 손익분석 대시보드 (최신)</div>
-    <div class="card-meta">
-      <span class="card-tag">손익/재무</span>
-      <span class="card-version">v4</span>
+    <div class="modal-btns" id="tokenBtns">
+      <button class="hbtn" onclick="closeModal('tokenModal')">취소</button>
+      <button class="hbtn primary" onclick="connectGitHub()">연결</button>
     </div>
-  </a>
-
-  <a class="card cat-finance" href="해외사업_손익분석_대시보드_v3.html" data-cat="finance" data-title="해외사업 손익분석 마스터 v3" data-desc="해외사업부 손익분석 대시보드">
-    <div class="card-icon">📊</div>
-    <div class="card-title">해외사업 손익분석 마스터</div>
-    <div class="card-desc">해외사업부 손익분석 대시보드</div>
-    <div class="card-meta">
-      <span class="card-tag">손익/재무</span>
-      <span class="card-version">v3</span>
+    <div class="disconnect-row" id="disconnectRow" style="display:none">
+      <span>연결됨</span>
+      <button class="hbtn" style="border-color:var(--r);color:var(--r)" onclick="disconnectGitHub()">연결 해제</button>
     </div>
-  </a>
-
-  <a class="card cat-finance" href="해외사업_손익분석_대시보드_v2.html" data-cat="finance" data-title="해외사업 손익분석 마스터 v2" data-desc="해외사업부 손익분석 대시보드">
-    <div class="card-icon">📊</div>
-    <div class="card-title">해외사업 손익분석 마스터</div>
-    <div class="card-desc">해외사업부 손익분석 대시보드</div>
-    <div class="card-meta">
-      <span class="card-tag">손익/재무</span>
-      <span class="card-version">v2</span>
-    </div>
-  </a>
-
-  <a class="card cat-finance" href="해외사업_손익분석_대시보드.html" data-cat="finance" data-title="해외사업 손익분석 대시보드 v1" data-desc="해외사업부 손익분석 대시보드 초기 버전">
-    <div class="card-icon">📊</div>
-    <div class="card-title">해외사업 손익분석 대시보드</div>
-    <div class="card-desc">해외사업부 손익분석 대시보드 (초기)</div>
-    <div class="card-meta">
-      <span class="card-tag">손익/재무</span>
-      <span class="card-version">v1</span>
-    </div>
-  </a>
-
-  <a class="card cat-product" href="drfelis-perfect-care.html" data-cat="product" data-title="Perfect Care Stick — Dr.Felis" data-desc="Dr.Felis 퍼펙트 케어 스틱 제품 페이지">
-    <div class="card-icon">🐱</div>
-    <div class="card-title">Perfect Care Stick — Dr.Felis</div>
-    <div class="card-desc">Dr.Felis 퍼펙트 케어 스틱 제품 페이지</div>
-    <div class="card-meta">
-      <span class="card-tag">제품</span>
-      <span class="card-version">v1</span>
-    </div>
-  </a>
-
+  </div>
 </div>
 
-<div class="footer">
-  Forcat · Felis · Dr.Felis — Claude Code Team Hub
+<!-- Add Card Modal -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h2>새 도구 추가</h2>
+    <div class="form-group">
+      <label>HTML 파일</label>
+      <div class="file-drop" id="fileDrop">
+        파일을 드래그하거나 클릭하여 선택<br><span style="font-size:11px;color:var(--t3)">(.html 파일만 가능)</span>
+        <input type="file" id="fileInput" accept=".html">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>제목</label>
+      <input type="text" id="addTitle" placeholder="도구 이름">
+    </div>
+    <div class="form-group">
+      <label>설명</label>
+      <input type="text" id="addDesc" placeholder="간단한 설명">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>카테고리</label>
+        <select id="addCat">
+          <option value="market">시장분석</option>
+          <option value="finance">손익/재무</option>
+          <option value="product">제품</option>
+          <option value="other">기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>버전</label>
+        <input type="text" id="addVer" placeholder="v1" value="v1">
+      </div>
+      <div class="form-group">
+        <label>아이콘</label>
+        <select id="addIcon">
+          <option value="🔍">🔍 분석</option>
+          <option value="📊">📊 차트</option>
+          <option value="🐱">🐱 제품</option>
+          <option value="📋">📋 리포트</option>
+          <option value="⚙️">⚙️ 도구</option>
+          <option value="🌏">🌏 해외</option>
+          <option value="💰">💰 매출</option>
+          <option value="📦">📦 재고</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>작성자</label>
+      <input type="text" id="addAuthor" placeholder="이름">
+    </div>
+    <div class="modal-btns">
+      <button class="hbtn" onclick="closeModal('addModal')">취소</button>
+      <button class="hbtn primary" id="btnUpload" onclick="uploadCard()">업로드</button>
+    </div>
+  </div>
 </div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal" style="max-width:400px">
+    <h2>카드 삭제</h2>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:8px" id="deleteMsg"></p>
+    <label style="font-size:12px;color:var(--t3);display:flex;align-items:center;gap:6px;margin-top:12px;cursor:pointer">
+      <input type="checkbox" id="deleteFileCheck" checked> HTML 파일도 함께 삭제
+    </label>
+    <div class="modal-btns">
+      <button class="hbtn" onclick="closeModal('deleteModal')">취소</button>
+      <button class="hbtn" style="background:var(--r);border-color:var(--r);color:#fff" onclick="confirmDelete()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-// Search
-const search = document.getElementById('search');
-const grid = document.getElementById('grid');
-const cards = grid.querySelectorAll('.card');
-const filterBtns = document.querySelectorAll('.filter-btn');
-let activeCat = 'all';
+const REPO = 'dean458/team-hub';
+const BRANCH = 'main';
+const CAT_LABELS = { market:'시장분석', finance:'손익/재무', product:'제품', other:'기타' };
 
-function filterCards() {
-  const q = search.value.toLowerCase().trim();
-  let visible = 0;
-  cards.forEach(c => {
-    const matchCat = activeCat === 'all' || c.dataset.cat === activeCat;
-    const matchSearch = !q ||
-      c.dataset.title.toLowerCase().includes(q) ||
-      c.dataset.desc.toLowerCase().includes(q);
-    const show = matchCat && matchSearch;
-    c.classList.toggle('hidden', !show);
-    if (show) visible++;
-  });
-  // empty state
-  let empty = grid.querySelector('.empty');
-  if (visible === 0) {
-    if (!empty) {
-      empty = document.createElement('div');
-      empty.className = 'empty';
-      empty.textContent = '검색 결과가 없습니다';
-      grid.appendChild(empty);
-    }
-  } else if (empty) {
-    empty.remove();
+let cards = [];
+let cardsBackup = [];
+let deletedFiles = [];
+let editMode = false;
+let token = localStorage.getItem('hub_token') || '';
+let uploadFile = null;
+let dragSrcIdx = null;
+let pendingDeleteIdx = null;
+
+// ── Init ──
+async function init() {
+  if (token) await verifyToken();
+  await loadCards();
+  render();
+  setupSearch();
+  setupFileDrop();
+}
+
+// ── GitHub API ──
+async function ghAPI(path, opts = {}) {
+  const url = path.startsWith('http') ? path : `https://api.github.com/repos/${REPO}/${path}`;
+  const headers = { 'Accept':'application/vnd.github.v3+json', ...opts.headers };
+  if (token) headers['Authorization'] = `token ${token}`;
+  const res = await fetch(url, { ...opts, headers });
+  if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+  return res.json();
+}
+
+async function getFileSha(path) {
+  try {
+    const data = await ghAPI(`contents/${encodeURIComponent(path)}?ref=${BRANCH}`);
+    return data.sha;
+  } catch { return null; }
+}
+
+async function putFile(path, content, message, isBase64 = false) {
+  const sha = await getFileSha(path);
+  const body = { message, content: isBase64 ? content : btoa(unescape(encodeURIComponent(content))), branch: BRANCH };
+  if (sha) body.sha = sha;
+  return ghAPI(`contents/${encodeURIComponent(path)}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+}
+
+async function deleteFile(path, message) {
+  const sha = await getFileSha(path);
+  if (!sha) return;
+  return ghAPI(`contents/${encodeURIComponent(path)}`, { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ message, sha, branch:BRANCH }) });
+}
+
+// ── Token ──
+function showTokenModal() {
+  const connected = !!token;
+  document.getElementById('tokenInput').value = '';
+  document.getElementById('tokenBtns').style.display = connected ? 'none' : 'flex';
+  document.getElementById('disconnectRow').style.display = connected ? 'flex' : 'none';
+  showModal('tokenModal');
+}
+
+async function connectGitHub() {
+  const t = document.getElementById('tokenInput').value.trim();
+  if (!t) return;
+  token = t;
+  localStorage.setItem('hub_token', token);
+  closeModal('tokenModal');
+  await verifyToken();
+  toast('GitHub 연결 완료', 'success');
+}
+
+function disconnectGitHub() {
+  token = '';
+  localStorage.removeItem('hub_token');
+  document.getElementById('statusDot').className = 'status-dot off';
+  document.getElementById('connectLabel').textContent = '연결';
+  document.getElementById('btnEdit').style.display = 'none';
+  document.getElementById('btnAdd').style.display = 'none';
+  if (editMode) cancelEdit();
+  closeModal('tokenModal');
+  toast('연결 해제됨', 'success');
+}
+
+async function verifyToken() {
+  try {
+    await ghAPI(`contents/cards.json?ref=${BRANCH}`);
+    document.getElementById('statusDot').className = 'status-dot on';
+    document.getElementById('connectLabel').textContent = '연결됨';
+    document.getElementById('btnEdit').style.display = '';
+    document.getElementById('btnAdd').style.display = '';
+    return true;
+  } catch {
+    document.getElementById('statusDot').className = 'status-dot off';
+    document.getElementById('connectLabel').textContent = '연결';
+    document.getElementById('btnEdit').style.display = 'none';
+    document.getElementById('btnAdd').style.display = 'none';
+    token = '';
+    localStorage.removeItem('hub_token');
+    return false;
   }
 }
 
-search.addEventListener('input', filterCards);
+// ── Load Cards ──
+async function loadCards() {
+  try {
+    const data = await ghAPI(`contents/cards.json?ref=${BRANCH}`);
+    cards = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g, '')))));
+  } catch { cards = []; }
+}
 
-filterBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    filterBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeCat = btn.dataset.cat;
-    filterCards();
+// ── Render ──
+function render() {
+  const grid = document.getElementById('grid');
+  const q = (document.getElementById('search').value || '').toLowerCase().trim();
+  const cat = document.querySelector('.filter-btn.active')?.dataset.cat || 'all';
+
+  const filtered = cards.filter(c => {
+    const matchCat = cat === 'all' || c.category === cat;
+    const matchQ = !q || c.title.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q) || (c.author||'').toLowerCase().includes(q);
+    return matchCat && matchQ;
   });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">등록된 도구가 없습니다</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => {
+    const realIdx = cards.indexOf(c);
+    return `
+    <div class="card cat-${c.category}" draggable="${editMode}" data-idx="${realIdx}"
+         ${editMode ? '' : `onclick="window.location.href='${encodeURI(c.file)}'"`}>
+      <div class="card-top">
+        <div class="card-icon">${c.icon || '📄'}</div>
+        <div class="card-actions">
+          <button class="del-btn" onclick="event.stopPropagation();removeCard(${realIdx})" title="삭제">✕</button>
+        </div>
+      </div>
+      <div class="card-title">${esc(c.title)}</div>
+      <div class="card-desc">${esc(c.desc)}</div>
+      <div class="card-meta">
+        <span class="card-tag">${CAT_LABELS[c.category] || c.category}</span>
+        ${c.author ? `<span class="card-author">by ${esc(c.author)}</span>` : ''}
+        <span class="card-version">${esc(c.version || '')}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (editMode) setupDrag();
+}
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ── Edit Mode ──
+function toggleEditMode() {
+  editMode = true;
+  cardsBackup = JSON.parse(JSON.stringify(cards));
+  deletedFiles = [];
+  document.body.classList.add('edit-mode');
+  document.getElementById('editIndicator').classList.add('show');
+  document.getElementById('btnEdit').style.display = 'none';
+  document.getElementById('btnAdd').style.display = 'none';
+  document.getElementById('btnSave').style.display = '';
+  document.getElementById('btnCancel').style.display = '';
+  render();
+}
+
+function cancelEdit() {
+  editMode = false;
+  cards = cardsBackup;
+  deletedFiles = [];
+  document.body.classList.remove('edit-mode');
+  document.getElementById('editIndicator').classList.remove('show');
+  document.getElementById('btnEdit').style.display = '';
+  document.getElementById('btnAdd').style.display = '';
+  document.getElementById('btnSave').style.display = 'none';
+  document.getElementById('btnCancel').style.display = 'none';
+  render();
+}
+
+async function saveChanges() {
+  const btn = document.getElementById('btnSave');
+  btn.textContent = '저장 중...';
+  btn.disabled = true;
+  try {
+    // Delete files marked for deletion
+    for (const f of deletedFiles) {
+      try { await deleteFile(f, `Remove ${f} via Hub`); } catch {}
+    }
+    // Save cards.json
+    await putFile('cards.json', JSON.stringify(cards, null, 2), 'Update cards from Hub');
+    editMode = false;
+    deletedFiles = [];
+    document.body.classList.remove('edit-mode');
+    document.getElementById('editIndicator').classList.remove('show');
+    document.getElementById('btnEdit').style.display = '';
+    document.getElementById('btnAdd').style.display = '';
+    document.getElementById('btnSave').style.display = 'none';
+    document.getElementById('btnCancel').style.display = 'none';
+    render();
+    toast('저장 완료', 'success');
+  } catch (e) {
+    toast('저장 실패: ' + e.message, 'error');
+  } finally {
+    btn.textContent = '저장';
+    btn.disabled = false;
+  }
+}
+
+// ── Drag & Drop (reorder) ──
+function setupDrag() {
+  const grid = document.getElementById('grid');
+  grid.querySelectorAll('.card').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      dragSrcIdx = parseInt(el.dataset.idx);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      grid.querySelectorAll('.card').forEach(c => c.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect='move'; el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      const targetIdx = parseInt(el.dataset.idx);
+      if (dragSrcIdx !== null && dragSrcIdx !== targetIdx) {
+        const item = cards.splice(dragSrcIdx, 1)[0];
+        cards.splice(targetIdx, 0, item);
+        render();
+      }
+    });
+  });
+}
+
+// ── Remove Card ──
+function removeCard(idx) {
+  pendingDeleteIdx = idx;
+  document.getElementById('deleteMsg').textContent = `"${cards[idx].title}" 카드를 삭제하시겠습니까?`;
+  document.getElementById('deleteFileCheck').checked = true;
+  showModal('deleteModal');
+}
+
+function confirmDelete() {
+  const idx = pendingDeleteIdx;
+  const card = cards[idx];
+  const deleteFileAlso = document.getElementById('deleteFileCheck').checked;
+  if (deleteFileAlso) deletedFiles.push(card.file);
+  cards.splice(idx, 1);
+  closeModal('deleteModal');
+  render();
+  toast(`"${card.title}" 삭제됨 (저장 시 반영)`, 'success');
+}
+
+// ── Add Card (Upload) ──
+function showAddModal() {
+  document.getElementById('addTitle').value = '';
+  document.getElementById('addDesc').value = '';
+  document.getElementById('addVer').value = 'v1';
+  document.getElementById('addAuthor').value = '';
+  uploadFile = null;
+  resetFileDrop();
+  showModal('addModal');
+}
+
+function resetFileDrop() {
+  const drop = document.getElementById('fileDrop');
+  drop.classList.remove('has-file');
+  drop.innerHTML = '파일을 드래그하거나 클릭하여 선택<br><span style="font-size:11px;color:var(--t3)">(.html 파일만 가능)</span><input type="file" id="fileInput" accept=".html">';
+  document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+}
+
+function setupFileDrop() {
+  const drop = document.getElementById('fileDrop');
+  drop.addEventListener('click', () => document.getElementById('fileInput').click());
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-active'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag-active'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag-active');
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith('.html')) setUploadFile(file);
+    else toast('.html 파일만 업로드 가능합니다', 'error');
+  });
+  document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+}
+
+function handleFileSelect(e) { if (e.target.files[0]) setUploadFile(e.target.files[0]); }
+
+function setUploadFile(file) {
+  uploadFile = file;
+  const drop = document.getElementById('fileDrop');
+  drop.classList.add('has-file');
+  drop.innerHTML = `✓ ${esc(file.name)}<br><span style="font-size:11px">${(file.size/1024).toFixed(1)} KB</span><input type="file" id="fileInput" accept=".html">`;
+  document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+  if (!document.getElementById('addTitle').value) {
+    document.getElementById('addTitle').value = file.name.replace('.html','').replace(/[_-]/g,' ');
+  }
+}
+
+async function uploadCard() {
+  if (!uploadFile) return toast('HTML 파일을 선택해주세요', 'error');
+  const title = document.getElementById('addTitle').value.trim();
+  if (!title) return toast('제목을 입력해주세요', 'error');
+
+  const btn = document.getElementById('btnUpload');
+  btn.textContent = '업로드 중...';
+  btn.disabled = true;
+
+  try {
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(btoa(reader.result));
+      reader.onerror = reject;
+      reader.readAsBinaryString(uploadFile);
+    });
+
+    await putFile(uploadFile.name, base64, `Add ${uploadFile.name} via Hub`, true);
+
+    const newCard = {
+      id: Date.now().toString(36),
+      title,
+      desc: document.getElementById('addDesc').value.trim() || title,
+      file: uploadFile.name,
+      category: document.getElementById('addCat').value,
+      version: document.getElementById('addVer').value.trim() || 'v1',
+      icon: document.getElementById('addIcon').value,
+      author: document.getElementById('addAuthor').value.trim() || ''
+    };
+    cards.unshift(newCard);
+
+    await putFile('cards.json', JSON.stringify(cards, null, 2), `Add card: ${title}`);
+
+    closeModal('addModal');
+    render();
+    toast(`"${title}" 추가 완료`, 'success');
+  } catch (e) {
+    toast('업로드 실패: ' + e.message, 'error');
+  } finally {
+    btn.textContent = '업로드';
+    btn.disabled = false;
+  }
+}
+
+// ── Search & Filter ──
+function setupSearch() {
+  document.getElementById('search').addEventListener('input', render);
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    });
+  });
+}
+
+// ── Modal ──
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('show'); });
 });
+
+// ── Toast ──
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Start ──
+init();
 </script>
 </body>
 </html>
