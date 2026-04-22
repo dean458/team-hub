@@ -129,10 +129,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Pretendard',sans
   <div class="header-right">
     <button class="hbtn" id="btnConnect" onclick="showTokenModal()">
       <div class="status-dot off" id="statusDot"></div>
-      <span id="connectLabel">연결</span>
+      <span id="connectLabel">GitHub</span>
     </button>
-    <button class="hbtn" id="btnEdit" onclick="toggleEditMode()" style="display:none">편집 모드</button>
-    <button class="hbtn primary" id="btnAdd" onclick="showAddModal()" style="display:none">+ 추가</button>
+    <button class="hbtn" id="btnEdit" onclick="toggleEditMode()">편집</button>
+    <button class="hbtn primary" id="btnAdd" onclick="showAddModal()">+ 추가</button>
     <button class="hbtn primary" id="btnSave" onclick="saveChanges()" style="display:none">저장</button>
     <button class="hbtn" id="btnCancel" onclick="cancelEdit()" style="display:none">취소</button>
   </div>
@@ -320,39 +320,48 @@ async function connectGitHub() {
   token = t;
   localStorage.setItem('hub_token', token);
   closeModal('tokenModal');
-  await verifyToken();
-  toast('GitHub 연결 완료', 'success');
+  const ok = await verifyToken();
+  if (ok) {
+    toast('GitHub 연결 완료', 'success');
+    if (pendingAction) { const fn = pendingAction; pendingAction = null; fn(); }
+  } else {
+    toast('Token이 유효하지 않습니다', 'error');
+  }
 }
 
 function disconnectGitHub() {
   token = '';
   localStorage.removeItem('hub_token');
-  document.getElementById('statusDot').className = 'status-dot off';
-  document.getElementById('connectLabel').textContent = '연결';
-  document.getElementById('btnEdit').style.display = 'none';
-  document.getElementById('btnAdd').style.display = 'none';
+  updateConnectionUI(false);
   if (editMode) cancelEdit();
   closeModal('tokenModal');
   toast('연결 해제됨', 'success');
 }
 
+function updateConnectionUI(connected) {
+  document.getElementById('statusDot').className = 'status-dot ' + (connected ? 'on' : 'off');
+  document.getElementById('connectLabel').textContent = connected ? '연결됨' : 'GitHub';
+}
+
 async function verifyToken() {
   try {
     await ghAPI(`contents/cards.json?ref=${BRANCH}`);
-    document.getElementById('statusDot').className = 'status-dot on';
-    document.getElementById('connectLabel').textContent = '연결됨';
-    document.getElementById('btnEdit').style.display = '';
-    document.getElementById('btnAdd').style.display = '';
+    updateConnectionUI(true);
     return true;
   } catch {
-    document.getElementById('statusDot').className = 'status-dot off';
-    document.getElementById('connectLabel').textContent = '연결';
-    document.getElementById('btnEdit').style.display = 'none';
-    document.getElementById('btnAdd').style.display = 'none';
+    updateConnectionUI(false);
     token = '';
     localStorage.removeItem('hub_token');
     return false;
   }
+}
+
+// Returns true if token is available, otherwise shows token modal with a callback
+let pendingAction = null;
+function requireToken(callback) {
+  if (token) { callback(); return; }
+  pendingAction = callback;
+  showTokenModal();
 }
 
 // ── Load Cards ──
@@ -434,6 +443,7 @@ function cancelEdit() {
 }
 
 async function saveChanges() {
+  if (!token) return requireToken(saveChanges);
   const btn = document.getElementById('btnSave');
   btn.textContent = '저장 중...';
   btn.disabled = true;
@@ -557,6 +567,7 @@ async function uploadCard() {
   if (!uploadFile) return toast('HTML 파일을 선택해주세요', 'error');
   const title = document.getElementById('addTitle').value.trim();
   if (!title) return toast('제목을 입력해주세요', 'error');
+  if (!token) return requireToken(uploadCard);
 
   const btn = document.getElementById('btnUpload');
   btn.textContent = '업로드 중...';
