@@ -40,26 +40,6 @@
     "author": "dean"
   },
   {
-    "id": "pnl-v2",
-    "title": "해외사업 손익분석 마스터",
-    "desc": "해외사업부 손익분석 대시보드",
-    "file": "해외사업_손익분석_대시보드_v2.html",
-    "category": "finance",
-    "version": "v2",
-    "icon": "📊",
-    "author": "dean"
-  },
-  {
-    "id": "pnl-v1",
-    "title": "해외사업 손익분석 대시보드",
-    "desc": "해외사업부 손익분석 대시보드 (초기)",
-    "file": "해외사업_손익분석_대시보드.html",
-    "category": "finance",
-    "version": "v1",
-    "icon": "📊",
-    "author": "dean"
-  },
-  {
     "id": "perfect-care",
     "title": "Perfect Care Stick — Dr.Felis",
     "desc": "Dr.Felis 퍼펙트 케어 스틱 제품 페이지",
