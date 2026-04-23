@@ -10,16 +10,6 @@
     "author": "dean"
   },
   {
-    "id": "jp-market-v1",
-    "title": "Japan Market Intelligence Agent",
-    "desc": "일본 시장 경쟁사 분석 에이전트 시스템 (초기)",
-    "file": "JP_Market_Agent_System_v1.html",
-    "category": "market",
-    "version": "v1",
-    "icon": "🔍",
-    "author": "dean"
-  },
-  {
     "id": "pnl-v4",
     "title": "해외사업 손익분석",
     "desc": "해외사업부 손익분석 대시보드 (최신)",
