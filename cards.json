@@ -1,5 +1,15 @@
 [
   {
+    "id": "sales-timeline",
+    "title": "Sales Timeline",
+    "desc": "세일즈팀 진행상황 타임라인 (로컬 전용 · localhost:3000)",
+    "file": "http://localhost:3000/timeline",
+    "category": "other",
+    "version": "dev",
+    "icon": "📋",
+    "author": "dean"
+  },
+  {
     "id": "jp-market-v2",
     "title": "Japan Market Intelligence Agent",
     "desc": "일본 시장 경쟁사 분석 에이전트 시스템 (최신)",
